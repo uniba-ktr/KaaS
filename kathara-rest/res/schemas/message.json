@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Message",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lab_name"
+  ],
+  "properties": {
+    "lab_name": {
+      "type": "string"
+    },
+    "lab_hash": {
+      "type": "string"
+    },
+    "lab_status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "created",
+        "starting",
+        "running",
+        "cleaning",
+        "removed"
+      ]
+    },
+    "success": {
+      "type": "boolean"
+    }
+  },
+  "info": {
+    "type": "object",
+    "properties": {
+      "kathara_": {
+        "type": "object"
+      }
+    }
+  }
+}
+
+
+

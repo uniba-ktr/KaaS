@@ -1,0 +1,13 @@
+{
+  "extends": ["config:base", ":prNotPending"],
+
+  "automerge": true,
+  "masterIssue": false,
+  "rebaseStalePrs": true,
+
+  "packageRules": [
+    { "packagePatterns": ["(^@vue\\/cli|^vue-cli)"], "groupName": "Vue CLI" },
+    { "packagePatterns": ["^eslint\\b"], "groupName": "ESLint" },
+    { "packagePatterns": ["^vis-"], "groupName": "Vis" }
+  ]
+}

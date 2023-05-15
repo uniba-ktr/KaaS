@@ -1,0 +1,3 @@
+#!/bin/sh
+# python version not dynamically set!
+python3 /usr/lib/python3.10/site-packages/kathara.py $@

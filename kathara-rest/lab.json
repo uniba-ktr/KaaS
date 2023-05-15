@@ -1,0 +1,74 @@
+{
+  "name": "example",
+  "description": "Test description",
+  "version": "1.0",
+  "author": "M.G.",
+  "email": "abc@def.org",
+  "web": "https://www.kathara.org",
+  "topo": [
+    {
+      "name": "pc1",
+      "net": [
+        {
+          "interface": 0,
+          "domain": "A"
+        }
+      ],
+      "image": "unibaktr/alpine",
+      "mem": "128m",
+      "cpus": 1.5,
+      "port": ["2000:500/udp", "2000:505/tcp"],
+      "ipv6": false,
+      "sysctl": ["net.ipv4.conf.all.forwarding=1", "net.ipv6.conf.all.forwarding=1"],
+      "env": ["VARIABLE=Test", "VARIABLE2=Hallo"],
+      "shell": "/bin/sh",
+      "num_terms": 1,
+      "bridged": true,
+      "files" : [
+        {
+          "name": "pc1.startup",
+          "content": "#!/bin/sh\nip address add 192.168.0.1/24 dev eth0\n"
+        },
+        {
+          "name": "pc1.shutdown",
+          "content": "#!/bin/sh\necho \"Shut Down\"\n"
+        },
+        {
+          "name": "resolv.conf",
+          "location": "/etc",
+          "content": "nameserver 1.1.1.1"
+        }
+      ]
+    },
+    {
+      "name": "pc2",
+      "net": [
+        {
+          "interface": 0,
+          "domain": "A"
+        }
+      ],
+      "image": "unibaktr/alpine",
+      "shell": "/bin/sh",
+      "files": [
+        {
+          "name": "pc2.startup",
+          "content": "#!/bin/sh\nip address add 192.168.0.2/24 dev eth0\n"
+        },
+        {
+          "name": "resolv.conf",
+          "location": "/etc",
+          "content": "nameserver 1.1.1.1"
+        }
+      ]
+    }
+  ],
+  "shared": {
+    "files": [
+      {
+        "name": "shared.startup",
+        "content": "#!/bin/sh\ncat <<EOT >> /etc/hosts\n# HOSTS\n192.168.0.1 pc1\n192.168.0.2 pc2\nEOT"
+      }
+    ]
+  }
+}

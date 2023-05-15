@@ -1,0 +1,19 @@
+.DS_Store
+/dist/
+/tests/e2e/reports/
+/tests/e2e/videos/
+/tests/unit/coverage/
+pyuv/
+node_modules/
+npm-debug.log*
+selenium-debug.log
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

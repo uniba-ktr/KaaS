@@ -1,0 +1,84 @@
+networks:
+  kind:
+  rest:
+
+volumes:
+  docker-certs-ca:
+  docker-certs-client:
+  docker-socket:
+
+services:
+  daemon:
+    image: kind:daemon
+    build:
+      dockerfile: daemon.dockerfile
+      context: ./kind
+    privileged: true
+    restart: on-failure:5
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    volumes:
+      - docker-certs-ca:/certs/ca
+      - docker-certs-client:/certs/client
+      - docker-socket:/var/run
+    networks:
+      kind:
+        aliases:
+          - docker
+
+  kathara-rest:
+    image: kind:rest
+    build:
+      dockerfile: kathara-rest.dockerfile
+      context: ./kathara-rest
+    depends_on:
+      - daemon
+    environment:
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_TLS_CERTDIR=/certs
+      - DOCKER_CERT_PATH=/certs/client
+      - DOCKER_HOST=tcp://docker:2376
+    volumes:
+      - docker-certs-client:/certs/client:ro
+      - ./kathara-rest/res:/kathara-rest/res
+      - ./kathara-rest/src:/kathara-rest/src
+    networks:
+      - kind
+      - rest
+    ports:
+      - 8000:8000
+
+  web-tty:
+    image: whatever4711/container-web-tty:latest
+    depends_on:
+      - daemon
+    restart: on-failure
+    ports:
+      - 8001:8080
+    networks:
+      - kind
+      - rest
+    environment:
+      - WEB_TTY_DEBUG=false
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_TLS_CERTDIR=/certs
+      - DOCKER_CERT_PATH=/certs/client
+      - DOCKER_HOST=tcp://docker:2376
+    volumes:
+      - docker-certs-client:/certs/client:ro
+
+  me:
+    image: me:latest
+    build:
+      dockerfile: me.dockerfile
+      context: ./kathara-me
+    volumes:
+      # Remove volume for production!
+      - ./kathara-me:/me
+    ports:
+      - 8080:8080
+    networks:
+      - rest
+
+# alias dco="docker-compose"
+

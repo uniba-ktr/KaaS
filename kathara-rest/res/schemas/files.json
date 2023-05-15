@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "files",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["name", "content"],
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "location": {
+        "type": "string"
+      },
+      "content": {
+        "type": "string"
+      }
+    }
+  }
+}
+
+

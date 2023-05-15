@@ -1,0 +1,9 @@
+fastapi~=0.79.0
+uvicorn
+websockets
+kathara~=3.5.0
+jsonschema~=4.7.2
+
+pydantic~=1.9.1
+docker~=5.0.3
+pytest~=7.1.2
