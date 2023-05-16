@@ -1,0 +1,41 @@
+networks:
+  kind:
+  rest:
+
+volumes:
+  docker-certs-ca:
+  docker-certs-client:
+  docker-socket:
+
+services:
+  daemon:
+    extends:
+      file: kaas.yml
+      service: daemon
+
+  web-tty:
+    extends:
+      file: kaas.yml
+      service: web-tty
+
+  kathara-rest:
+    extends:
+      file: kaas.yml
+      service: kathara-rest
+    build:
+      dockerfile: kathara-rest.dockerfile
+      context: ./kathara-rest
+    volumes:
+      - ./kathara-rest/res:/kathara-rest/res
+      - ./kathara-rest/src:/kathara-rest/src
+
+  kathara-ui:
+    extends:
+      file: kaas.yml
+      service: kathara-ui
+    build:
+      dockerfile: kathara-ui.dockerfile
+      context: ./kathara-ui
+    # volumes only work if npm install was executed locally in the folder kathara-ui
+    volumes:
+      - ./kathara-ui:/me
