@@ -24,10 +24,7 @@ services:
           - docker
 
   kathara-rest:
-    image: kind:rest
-    build:
-      dockerfile: kathara-rest.dockerfile
-      context: ./kathara-rest
+    image: ghcr.io/uniba-ktr/kaas-kathara-rest:latest
     depends_on:
       - daemon
     environment:
@@ -37,8 +34,6 @@ services:
       - DOCKER_HOST=tcp://docker:2376
     volumes:
       - docker-certs-client:/certs/client:ro
-      - ./kathara-rest/res:/kathara-rest/res
-      - ./kathara-rest/src:/kathara-rest/src
     networks:
       - kind
       - rest
@@ -65,16 +60,8 @@ services:
       - docker-certs-client:/certs/client:ro
 
   kathara-ui:
-    image: kathara-ui:latest
-    build:
-      dockerfile: kathara-ui.dockerfile
-      context: ./kathara-ui
-    volumes:
-      # Remove volume for production!
-      - ./kathara-me:/me
+    image: ghcr.io/uniba-ktr/kaas-kathara-ui:latest
     ports:
       - 8080:8080
     networks:
       - rest
-
-# alias dco="docker-compose"
