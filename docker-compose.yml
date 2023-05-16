@@ -9,10 +9,7 @@ volumes:
 
 services:
   daemon:
-    image: kind:daemon
-    build:
-      dockerfile: daemon.dockerfile
-      context: ./kind
+    image: docker:dind
     privileged: true
     restart: on-failure:5
     environment:
@@ -67,11 +64,11 @@ services:
     volumes:
       - docker-certs-client:/certs/client:ro
 
-  me:
-    image: me:latest
+  kathara-ui:
+    image: kathara-ui:latest
     build:
-      dockerfile: me.dockerfile
-      context: ./kathara-me
+      dockerfile: kathara-ui.dockerfile
+      context: ./kathara-ui
     volumes:
       # Remove volume for production!
       - ./kathara-me:/me
@@ -81,4 +78,3 @@ services:
       - rest
 
 # alias dco="docker-compose"
-
