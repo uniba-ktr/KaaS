@@ -41,7 +41,7 @@ services:
       - 8000:8000
 
   web-tty:
-    image: ghcr.io/whatever4711/container-web-tty:latest
+    image: ghcr.io/uniba-ktr/kaas-web-tty:latest
     depends_on:
       - daemon
     restart: on-failure
