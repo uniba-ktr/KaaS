@@ -24,7 +24,7 @@ jobs:
   build-and-push-image:
     strategy:
       matrix:
-        framework: [kathara-ui, kathara-rest]
+        framework: [kathara-ui, kathara-rest, web-tty]
     runs-on: ubuntu-latest
     permissions:
       contents: read

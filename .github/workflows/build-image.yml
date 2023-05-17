@@ -17,7 +17,7 @@ jobs:
   build-image:
     strategy:
       matrix:
-        framework: [kathara-ui, kathara-rest]
+        framework: [kathara-ui, kathara-rest, web-tty]
 
     runs-on: ubuntu-latest
     permissions:
