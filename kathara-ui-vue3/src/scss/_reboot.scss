@@ -1,0 +1,66 @@
+html {
+	height: 100%;
+	background-color: $body-bg;
+	background-image: $body-bg-gradient;
+	
+	&:before {
+    content: '';
+		position:fixed;
+		top:0;
+		left:0;
+		right:0;
+		height:100%;
+		z-index:-5; 
+		background: $body-bg-gradient;
+	}
+	&:after {
+		content: '';
+		position:fixed;
+		top:0;
+		height:100%;
+		left:0;
+		right:0;
+		z-index:-10; 
+		background-color: $body-bg;
+		background-image: $body-bg-gradient;
+		background-image: $body-bg-cover;
+		background-repeat: no-repeat;
+		background-position: center;
+		background-attachment: initial;
+		height: 100%;
+		transition: background .2s linear;
+		background-size: cover;
+	}
+}
+body {
+	background: none;
+	font-weight: $font-weight-light;
+	letter-spacing: $body-letter-spacing;
+	position: relative;
+	min-height: 100vh;
+	z-index: 9999;
+	
+	@if ($enable-rtl) {
+		direction: rtl;
+	}
+	
+	&:before {
+		content: "";
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 100%;
+		background-attachment: initial;
+		background-color: transparent;
+		background-image: $body-bg-image;
+		background-size: $body-bg-image-size;
+		background-repeat: repeat;
+		background-attachment: initial;
+		z-index: -5;
+	}
+	&:not(.app-init) * {
+		transition: none !important;
+		animation: none !important;
+	}
+}

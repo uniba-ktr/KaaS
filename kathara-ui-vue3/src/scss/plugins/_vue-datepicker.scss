@@ -1,0 +1,115 @@
+body {
+	& .dp__menu,
+	& .dp__calendar_wrap,
+	& .dp__main {
+		font-family: $font-family-base;
+	}
+	& .dp__theme_dark {
+		--dp-background-color: #{$dropdown-bg};
+		--dp-text-color: #{$body-color};
+		--dp-hover-color: #{rgba($white, .15)};
+		--dp-hover-text-color: #{$white};
+		--dp-hover-icon-color: #{rgba($white, .5)};
+		--dp-primary-color: var(--bs-theme);
+		--dp-primary-text-color: #{$white};
+		--dp-secondary-color: var(--bs-gray-500);
+		--dp-border-color: #{$dropdown-border-color};
+		--dp-menu-border-color: #{$input-border-color};
+		--dp-border-color-hover: #{$input-border-color};
+		--dp-disabled-color: var(--bs-gray-500);
+		--dp-scroll-bar-background: #{rgba($white, .25)};
+		--dp-scroll-bar-color: var(--bs-gray-500);
+		--dp-success-color: #{$success};
+		--dp-success-color-disabled: #{$white};
+		--dp-icon-color: #{rgba($white, .5)};
+		--dp-danger-color: #{$danger};
+	}
+	& .dp__cell_inner,
+	& .dp__calendar_header_item {
+		padding: $spacer * .25;
+		width: rem(46px);
+		height: rem(34px);
+	}
+	& .dp__month_year_row {
+		padding: $spacer * .25;
+		height: rem(46px);
+	}
+	& .dp__calendar_row {
+		padding: 0 $spacer * .25;
+	}
+	& .dp__inner_nav {
+		width: rem(34px);
+		height: rem(34px);
+	}
+	& .dp__action_buttons {
+		display: flex;
+		justify-content: end;
+	}
+	& .dp__action {
+		display: inline-block;
+		font-family: $btn-font-family;
+		font-weight: $btn-font-weight;
+		line-height: $btn-line-height;
+		color: var(--#{$prefix}btn-color);
+		text-align: center;
+		text-decoration: if($link-decoration == none, null, none);
+		white-space: $btn-white-space;
+		vertical-align: middle;
+		cursor: if($enable-button-pointers, pointer, null);
+		user-select: none;
+		background-color: transparent;
+		border: $btn-border-width solid var(--#{$prefix}btn-border-color);
+		font-size: $font-size-sm;
+		@include transition($btn-transition);
+		
+		&.dp__cancel {
+    	@include button-outline-variant($default);
+		}
+		&.dp__select {
+    	@include button-outline-variant($theme);
+		}
+		&:hover {
+			color: var(--#{$prefix}btn-hover-color);
+			background: var(--#{$prefix}btn-hover-bg);
+		}
+		& + .dp__action {
+			@if $enable-rtl {
+				margin-right: $spacer * .5;
+			} @else {
+				margin-left: $spacer * .5;
+			}
+		}
+	}
+	& .dp__input {
+		display: block;
+		width: 100%;
+		font-family: $font-family-base;
+		font-weight: $input-font-weight;
+		line-height: $input-line-height;
+		color: $input-color;
+		background-color: $input-bg;
+		background-clip: padding-box;
+		border: $input-border-width solid $input-border-color;
+		appearance: none;
+		
+		@include font-size($input-font-size);
+		@include border-radius($input-border-radius, 0);
+		@include box-shadow($input-box-shadow);
+		
+		&::placeholder {
+  		font-family: $input-font-family;
+  		color: $input-placeholder-color;
+		}
+		&.dp__input_focus {
+			color: $input-focus-color;
+			background-color: $input-focus-bg;
+			border-color: $input-focus-border-color;
+			outline: 0;
+			@if $enable-shadows {
+				@include box-shadow($input-box-shadow, $input-focus-box-shadow);
+			} @else {
+				box-shadow: $input-focus-box-shadow;
+			}
+		}
+	}
+}
