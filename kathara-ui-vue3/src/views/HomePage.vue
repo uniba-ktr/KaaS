@@ -411,6 +411,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
+import { useGraphStore } from "@/stores/app-graph";
 import type { Layouts } from "v-network-graph";
 import type {
   DeviceInterface,
@@ -420,60 +421,15 @@ import type {
 } from "@/models/graph-models";
 import * as vNG from "v-network-graph";
 
+// get pinia graph store
+const graphStore = useGraphStore()
+
 // v-network-graph variables
-const nodes = reactive<Record<string, NetworkDevice | CollisionDomain>>({
-  cd1: {
-    name: "A",
-    code: "A",
-    node_type: "collision_domain",
-    pos_X: 80,
-    pos_Y: 80,
-  },
-  nd2: {
-    name: "pc2",
-    docker_image: "unibaktr/alpine",
-    interfaces: [
-      {
-        index: "0",
-        cd: "B",
-      },
-    ],
-    node_type: "network_device",
-    type: "client",
-    pos_X: 160,
-    pos_Y: 0,
-  },
-  nd1: {
-    name: "pc1",
-    docker_image: "unibaktr/alpine",
-    interfaces: [
-      {
-        index: "0",
-        cd: "A",
-      },
-    ],
-    node_type: "network_device",
-    type: "client",
-    pos_X: 0,
-    pos_Y: 0,
-  },
-  cd2: {
-    name: "B",
-    code: "B",
-    node_type: "collision_domain",
-    pos_X: 160,
-    pos_Y: 200,
-  },
-});
+const nodes = graphStore.nodes;
 
-const edges = reactive<Record<string, KatharaLink>>({
-  edge1: { source: "cd1", target: "nd1", info: { index: "0", cd: "A" } },
-  edge2: { source: "nd2", target: "cd2", info: { index: "0", cd: "B" } },
-});
+const edges = graphStore.edges;
 
-const layouts: Layouts = reactive({
-  nodes: {},
-});
+const layouts = graphStore.layout;
 
 const configs = reactive(
   vNG.defineConfigs({
@@ -528,23 +484,29 @@ const configs = reactive(
 onMounted(() => createLayout());
 
 function createLayout() {
+  /*
   Object.keys(nodes).forEach((nodeId: string) => {
     const x = nodes[nodeId].pos_X;
     const y = nodes[nodeId].pos_Y;
     layouts.nodes[nodeId] = { x, y };
   });
+   */
+  console.log("createLayout() called...")
 }
 
 const eventHandlers: vNG.EventHandlers = {
   "node:dragend": (draggedNode) => {
     const draggedNodeId = Object.keys(draggedNode)[0];
-    /*console.log(
+    console.log(
       `Drag node ${draggedNodeId} with x-pos: ${JSON.stringify(
         draggedNode[draggedNodeId].x
       )} and y-pos: ${JSON.stringify(draggedNode[draggedNodeId].y)}`
-    );*/
-    nodes[draggedNodeId].pos_X = draggedNode[draggedNodeId].x;
-    nodes[draggedNodeId].pos_Y = draggedNode[draggedNodeId].y;
+    );
+    graphStore.updateNodePosition(draggedNodeId,
+      draggedNode[draggedNodeId].x,
+      draggedNode[draggedNodeId].y);
+    //nodes[draggedNodeId].pos_X = draggedNode[draggedNodeId].x;
+    //nodes[draggedNodeId].pos_Y = draggedNode[draggedNodeId].y;
   },
   "node:dblclick": (clickedNode) => {
     if (clickedNode.event.detail == 2) {
@@ -678,8 +640,8 @@ const addEditCollisionDomain = () => {
       code: newCdCode.value,
       node_type: "collision_domain",
       name: newCdCode.value,
-      pos_X: 100,
-      pos_Y: 100,
+      // pos_X: 100,
+      // pos_Y: 100,
     };
     const nodeId = `cd_${newCdCode.value}`;
     nodes[nodeId] = newCollisionDomain;
@@ -715,8 +677,8 @@ const addEditNetworkDevice = () => {
           : undefined,
       env: deviceEnv.value !== "" ? deviceEnv.value : undefined,
       shell: deviceShell.value !== "" ? deviceShell.value : undefined,
-      pos_X: 100,
-      pos_Y: 100,
+      // pos_X: 100,
+      // pos_Y: 100,
     };
     const nodeId = deviceName.value;
     nodes[nodeId] = newNetworkDevice;
