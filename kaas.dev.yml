@@ -34,8 +34,8 @@ services:
       file: kaas.yml
       service: kathara-ui
     build:
-      dockerfile: kathara-ui.dockerfile
+      dockerfile: kathara-ui-vue3.dockerfile
       context: ./kathara-ui
     # volumes only work if npm install was executed locally in the folder kathara-ui
     volumes:
-      - ./kathara-ui:/me
+      - ./kathara-ui:/vue3

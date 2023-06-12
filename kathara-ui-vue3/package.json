@@ -2,7 +2,7 @@
   "name": "hud-vue",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --port 18080",
+    "dev": "vite --port 8080",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --port 5050",
     "test:unit": "vitest --environment jsdom",

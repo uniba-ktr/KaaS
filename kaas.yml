@@ -60,7 +60,7 @@ services:
       - docker-certs-client:/certs/client:ro
 
   kathara-ui:
-    image: ghcr.io/uniba-ktr/kaas-kathara-ui:latest
+    image: ghcr.io/uniba-ktr/kaas-kathara-ui-vue3:latest
     ports:
       - 8080:8080
     networks:
