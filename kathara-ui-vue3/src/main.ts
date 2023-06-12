@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { Vue3ProgressPlugin } from "@marcoschulte/vue3-progress";
 import PerfectScrollbar from "vue3-perfect-scrollbar";
 import mitt from "mitt";
@@ -43,7 +44,7 @@ app.component("CardGroup", CardGroup);
 app.component("CardImgOverlay", CardImgOverlay);
 app.component("CardExpandToggler", CardExpandToggler);
 
-app.use(createPinia());
+app.use(createPinia().use(piniaPluginPersistedstate));
 app.use(router);
 app.use(Vue3ProgressPlugin);
 app.use(PerfectScrollbar);

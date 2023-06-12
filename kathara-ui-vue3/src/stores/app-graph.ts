@@ -84,4 +84,5 @@ export const useGraphStore = defineStore("graph", {
     getEdges: (state) => state.edges,
     getLayout: (state) => state.layout,
   },
+  persist: true,
 });
