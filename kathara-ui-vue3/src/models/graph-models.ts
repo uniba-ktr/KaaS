@@ -8,8 +8,8 @@ export interface DeviceInterface {
 export interface CollisionDomain extends Node {
   node_type: string;
   code: string;
-  pos_X: number;
-  pos_Y: number;
+  // pos_X: number;
+  // pos_Y: number;
 }
 
 export interface NetworkDevice extends Node {
@@ -26,8 +26,8 @@ export interface NetworkDevice extends Node {
   sysctl?: string;
   env?: string;
   shell?: string;
-  pos_X: number;
-  pos_Y: number;
+  // pos_X: number;
+  // pos_Y: number;
 }
 
 export interface KatharaLink extends Edge {
