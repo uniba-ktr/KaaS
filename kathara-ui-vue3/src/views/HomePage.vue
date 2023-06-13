@@ -37,7 +37,7 @@
     <button
       type="button"
       class="btn btn-lg me-1 btn-success"
-      :disabled="isEdgeEligible(selectedNodes)"
+      :disabled="!isEdgeEligible(selectedNodes)"
       data-bs-toggle="modal"
       data-bs-target="#modalEdge"
       @click="openEdgeModal(true)"
@@ -615,6 +615,7 @@ const eventHandlers: vNG.EventHandlers = {
 };
 
 // kathara system
+const katharaMode = ref("editing");
 const selectedNodes = ref<string[]>([]);
 const selectedEdges = ref<string[]>([]);
 const nextCDIndex = ref(
@@ -787,10 +788,10 @@ const selectedDeviceInterfaceIndex = ref("0");
 const selectedCDValue = ref("");
 
 const isEdgeEligible = (selected: string[]): boolean => {
-  if (selected.length !== 2) return true;
+  if (selected.length !== 2) return false;
   const sourceName = selected[0];
   const targetName = selected[1];
-  return nodes[sourceName].type === nodes[targetName].type;
+  return nodes[sourceName].node_type !== nodes[targetName].node_type;
 };
 
 const openEdgeModal = (mode: boolean) => {
