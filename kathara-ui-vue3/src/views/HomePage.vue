@@ -72,7 +72,51 @@
     :layouts="layouts"
     :configs="configs"
     :event-handlers="eventHandlers"
-  />
+  >
+    <defs>
+      <!--
+        Define the path for clipping the face image.
+        To change the size of the applied node as it changes,
+        add the `clipPathUnits="objectBoundingBox"` attribute
+        and specify the relative size (0.0~1.0).
+      -->
+      <clipPath id="iconCircle" clipPathUnits="objectBoundingBox">
+        <circle cx="0.5" cy="0.5" r="0.5" />
+      </clipPath>
+    </defs>
+    <!-- Replace the node component -->
+    <template #override-node="{ nodeId, scale, config, ...slotProps }">
+      <!-- circle for filling background -->
+      <circle
+        class="icon-circle"
+        :r="config.radius * scale"
+        fill="#ffffff"
+        v-bind="slotProps"
+      />
+      <!--
+        The base position of the <image /> is top left. The node's
+        center should be (0,0), so slide it by specifying x and y.
+      -->
+      <image
+        class="icon-picture"
+        :x="-config.radius * scale"
+        :y="-config.radius * scale"
+        :width="config.radius * scale * 2"
+        :height="config.radius * scale * 2"
+        :xlink:href="`./icons/${nodes[nodeId].icon}`"
+        clip-path="url(#iconCircle)"
+      />
+      <!-- circle for drawing stroke -->
+      <circle
+        class="icon-circle"
+        :r="config.radius * scale"
+        fill="none"
+        stroke="#808080"
+        :stroke-width="1 * scale"
+        v-bind="slotProps"
+      />
+    </template>
+  </v-network-graph>
   <!-- BEGIN #modalCollisionDomain -->
   <div class="modal fade" id="modalCollisionDomain">
     <div class="modal-dialog">
@@ -412,7 +456,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { useGraphStore } from "@/stores/app-graph";
-import type { Layouts } from "v-network-graph";
 import type {
   DeviceInterface,
   CollisionDomain,
@@ -640,6 +683,7 @@ const addEditCollisionDomain = () => {
       code: newCdCode.value,
       node_type: "collision_domain",
       name: newCdCode.value,
+      icon: "collision-domain.png"
       // pos_X: 100,
       // pos_Y: 100,
     };
@@ -654,6 +698,22 @@ const closeCollisionDomainModal = () => {
   newCdCode.value = "";
 };
 
+function deviceIcon(deviceType: string): string {
+  switch (deviceType) {
+    case "linux-switch":
+      return "network-switch.png";
+    case "traefik-balancer":
+      return "network-balancer.png";
+    case "dns-server":
+      return "network-dns.png";
+    case "vyatta-router":
+    case "frr-router":
+      return "network-router.png";
+    default:
+      return "network-pc.png";
+  }
+}
+
 const addEditNetworkDevice = () => {
   if (nodeMode.value) {
     const newNetworkDevice: NetworkDevice = {
@@ -661,6 +721,7 @@ const addEditNetworkDevice = () => {
       node_type: "network_device",
       type: selectedDeviceType.value,
       docker_image: deviceDockerImage.value,
+      icon: deviceIcon(selectedDeviceType.value),
       interfaces: [],
       startup_script:
         deviceStartupScript.value !== ""
@@ -855,5 +916,13 @@ const showGraphInfo = () => {
   height: 600px;
   border: 1px solid #fff;
   background-color: aliceblue;
+}
+.icon-circle,
+.icon-picture {
+  transition: all 0.1s linear;
+}
+
+.icon-picture {
+  pointer-events: none;
 }
 </style>

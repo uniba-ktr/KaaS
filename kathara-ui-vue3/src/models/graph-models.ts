@@ -8,6 +8,7 @@ export interface DeviceInterface {
 export interface CollisionDomain extends Node {
   node_type: string;
   code: string;
+  icon: string;
   // pos_X: number;
   // pos_Y: number;
 }
@@ -16,6 +17,7 @@ export interface NetworkDevice extends Node {
   node_type: string;
   type: string;
   docker_image: string;
+  icon: string;
   interfaces?: DeviceInterface[];
   startup_script?: string;
   memory?: string;
