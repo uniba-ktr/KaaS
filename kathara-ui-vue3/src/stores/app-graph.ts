@@ -1,15 +1,12 @@
-import { defineStore } from "pinia";
-import type { Layouts } from "v-network-graph";
-import type {
-  DeviceInterface,
-  CollisionDomain,
-  NetworkDevice,
-  KatharaLink,
-} from "@/models/graph-models";
+import {defineStore} from "pinia";
+import type {Layouts} from "v-network-graph";
+import type {CollisionDomain, DeviceInterface, GraphLink, NetworkDevice,} from "@/models/graph-models";
+
+import type {KatharaLab, LabDevice, Network} from "@/models/lab-models";
 
 export type RootState = {
   nodes: Record<string, CollisionDomain | NetworkDevice>;
-  edges: Record<string, KatharaLink>;
+  edges: Record<string, GraphLink>;
   layout: Layouts;
 };
 
@@ -81,6 +78,49 @@ export const useGraphStore = defineStore("graph", {
     updateNodePosition(nodeName: string, pos_X: number, pos_Y: number) {
       this.layout.nodes[nodeName].x = pos_X;
       this.layout.nodes[nodeName].y = pos_Y;
+    },
+    convertGraphToJson(): KatharaLab {
+      let labJson: KatharaLab = {
+        name: "Simple Lab",
+        description: "A simple Kathara Lab",
+        version: "1.0.0",
+        author: "Thanh Le",
+        email: "thanhledev@gmail.com",
+        topo: [],
+      }
+
+      for (const k in this.$state.nodes) {
+        const node = this.$state.nodes[k];
+        switch (node.node_type) {
+          case 'collision_domain':
+            break;
+          case 'network_device':
+            labJson.topo.push(this.convertGraphNodeToLabDevice(k, <NetworkDevice>node));
+        }
+      }
+
+      return labJson;
+    },
+    convertGraphNodeToLabDevice(node_name: string, node: NetworkDevice): LabDevice {
+      return {
+        name: node_name,
+        image: node.docker_image,
+        mem: node.memory,
+        cpus: node.cpus,
+        bridged: node.bridged,
+        ipv6: node.ipv6,
+        net: node.interfaces ? this.convertGraphNodeInterfacesToNetworks(node.interfaces) : [],
+      };
+    },
+    convertGraphNodeInterfacesToNetworks(interfaces: DeviceInterface[]): Network[] {
+      let deviceNetworks: Network[] = [];
+      for (let i in interfaces) {
+        deviceNetworks.push({
+          interface: Number(interfaces[i].index),
+          domain: interfaces[i].cd,
+        })
+      }
+      return deviceNetworks;
     }
   },
   getters: {

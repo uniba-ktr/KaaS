@@ -14,7 +14,7 @@ import {
   setUser,
   deleteUser,
 } from "@/support/storageHelper";
-import { auth_api, AUTH_API_VERSION_PREFIX } from "@/support/httpCommon";
+import { kathara_api } from "@/support/httpCommon";
 
 export type RootState = {
   user: IUserProfile;
@@ -47,16 +47,16 @@ export const useAuthStore = defineStore("auth", {
       this.authenticated = true;
     },
     async DO_LOGIN(payload: IAuthRequestPayload) {
-      await auth_api
-        .post(`${AUTH_API_VERSION_PREFIX}/auth/login`, payload)
+      await kathara_api
+        .post(`/auth/login`, payload)
         .then(async (response) => {
           this.SET_TOKEN(response.data);
           await this.GET_USER();
         });
     },
     async GET_USER() {
-      await auth_api
-        .get(`${AUTH_API_VERSION_PREFIX}/users/me`)
+      await kathara_api
+        .get(`/users/me`)
         .then((response) => {
           setUser(response.data);
           this.user = response.data;

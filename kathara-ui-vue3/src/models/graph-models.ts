@@ -32,6 +32,6 @@ export interface NetworkDevice extends Node {
   // pos_Y: number;
 }
 
-export interface KatharaLink extends Edge {
+export interface GraphLink extends Edge {
   info: DeviceInterface;
 }

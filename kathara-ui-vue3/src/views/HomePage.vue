@@ -10,9 +10,9 @@
     <button
       type="button"
       class="btn btn-warning mb-1 me-1 btn-lg"
-      @click="showGraphInfo"
+      @click="showLabJson"
     >
-      Show graph info
+      Show lab json
     </button>
     <button
       type="button"
@@ -460,12 +460,13 @@ import type {
   DeviceInterface,
   CollisionDomain,
   NetworkDevice,
-  KatharaLink,
+  GraphLink,
 } from "@/models/graph-models";
+
 import * as vNG from "v-network-graph";
 
 // get pinia graph store
-const graphStore = useGraphStore()
+const graphStore = useGraphStore();
 
 // v-network-graph variables
 const nodes = graphStore.nodes;
@@ -524,18 +525,18 @@ const configs = reactive(
 );
 
 // preload position
-onMounted(() => createLayout());
+// onMounted(() => createLayout());
 
+/*
 function createLayout() {
-  /*
   Object.keys(nodes).forEach((nodeId: string) => {
     const x = nodes[nodeId].pos_X;
     const y = nodes[nodeId].pos_Y;
     layouts.nodes[nodeId] = { x, y };
   });
-   */
   console.log("createLayout() called...")
 }
+*/
 
 const eventHandlers: vNG.EventHandlers = {
   "node:dragend": (draggedNode) => {
@@ -902,12 +903,11 @@ const onDeviceTypeChange = () => {
   }
 };
 
-const showGraphInfo = () => {
+const showLabJson = () => {
   console.log(nodes);
   console.log(edges);
-  console.log(`CD index: ${nextCDIndex.value}`);
-  console.log(`ND index: ${nextNDIndex.value}`);
-  console.log(`nodeMode: ${nodeMode.value}`);
+  const lab_json = graphStore.convertGraphToJson();
+  console.log(lab_json);
 };
 </script>
 

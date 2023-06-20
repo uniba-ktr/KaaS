@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const AUTH_API_VERSION_PREFIX = "/api/v1";
+// const AUTH_API_VERSION_PREFIX = "/api/v1";
 
-const auth_api = axios.create({
+const kathara_api = axios.create({
   baseURL: "http://localhost:8000",
   headers: {
     Accept: "application/json",
@@ -11,9 +11,9 @@ const auth_api = axios.create({
 });
 
 const setToken = (token: string | null) =>
-  (auth_api.defaults.headers!.common["Authorization"] = `Bearer ${token}`);
+  (kathara_api.defaults.headers!.common["Authorization"] = `Bearer ${token}`);
 
 const deleteToken = () =>
-  delete auth_api.defaults.headers?.common["Authorization"];
+  delete kathara_api.defaults.headers?.common["Authorization"];
 
-export { auth_api, setToken, deleteToken, AUTH_API_VERSION_PREFIX };
+export { kathara_api, setToken, deleteToken };

@@ -1,3 +1,4 @@
+import uvicorn
 import json
 from pathlib import Path
 from random import random
@@ -213,3 +214,6 @@ async def create_lab(info: Laboratory):
     result = LabController().gen_lab(info)
 
     return result
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
