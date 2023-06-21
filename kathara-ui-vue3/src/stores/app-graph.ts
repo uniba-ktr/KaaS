@@ -102,15 +102,32 @@ export const useGraphStore = defineStore("graph", {
       return labJson;
     },
     convertGraphNodeToLabDevice(node_name: string, node: NetworkDevice): LabDevice {
-      return {
+      let labDevice: LabDevice = {
         name: node_name,
-        image: node.docker_image,
-        mem: node.memory,
-        cpus: node.cpus,
-        bridged: node.bridged,
-        ipv6: node.ipv6,
         net: node.interfaces ? this.convertGraphNodeInterfacesToNetworks(node.interfaces) : [],
-      };
+      }
+
+      if (node.docker_image) {
+        labDevice.image = node.docker_image;
+      }
+
+      if (node.memory) {
+        labDevice.mem = node.memory;
+      }
+
+      if (node.cpus) {
+        labDevice.cpus = node.cpus;
+      }
+
+      if (node.bridged) {
+        labDevice.bridged = node.bridged;
+      }
+
+      if (node.ipv6) {
+        labDevice.ipv6 = node.ipv6;
+      }
+
+      return labDevice;
     },
     convertGraphNodeInterfacesToNetworks(interfaces: DeviceInterface[]): Network[] {
       let deviceNetworks: Network[] = [];
