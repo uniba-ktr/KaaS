@@ -8,6 +8,13 @@
   </h1>
   <p>
     <button
+        type="button"
+        class="btn btn-success mb-1 me-1 btn-lg"
+        @click="createLab"
+    >
+      Create Kathara Lab
+    </button>
+    <button
       type="button"
       class="btn btn-warning mb-1 me-1 btn-lg"
       @click="showLabJson"
@@ -929,6 +936,11 @@ const showLabJson = () => {
   const lab_json = graphStore.convertGraphToJson();
   console.log(lab_json);
 };
+
+const createLab = () => {
+  console.log("Try creating Kathara lab from current settings...");
+}
+
 </script>
 
 <style scoped>

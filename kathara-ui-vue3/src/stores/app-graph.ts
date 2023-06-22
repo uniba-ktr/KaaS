@@ -146,7 +146,7 @@ export const useGraphStore = defineStore("graph", {
         })
       }
 
-      if (Array.isArray(scriptFiles)) {
+      if (scriptFiles.length > 0) {
         labDevice.files = Array.from(scriptFiles);
       }
 
