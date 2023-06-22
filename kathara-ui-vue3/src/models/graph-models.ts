@@ -20,6 +20,7 @@ export interface NetworkDevice extends Node {
   icon: string;
   interfaces?: DeviceInterface[];
   startup_script?: string;
+  shutdown_script?: string;
   memory?: string;
   cpus?: number;
   bridged?: boolean;

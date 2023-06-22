@@ -146,7 +146,7 @@
             </div>
           </div>
           <div class="alert alert-muted">
-            <b>Please note:</b>
+            <b>Note:</b>
             Character only. For example: A, B, C, ..., AA, BB, ...
           </div>
         </div>
@@ -249,13 +249,25 @@
             </div>
           </div>
           <div class="mb-3">
+            <label class="form-label">Device Shutdown Script:</label>
+            <div class="row row-space-10">
+              <div class="col-12">
+                <textarea
+                    class="form-control"
+                    v-model="deviceShutdownScript"
+                    rows="10"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
             <label class="form-label">Device Memory:</label>
             <div class="row row-space-10">
               <div class="col-12">
                 <input
                   class="form-control"
                   type="text"
-                  placeholder="Device memory. Format: xxx[b/k/m/g] (e.g., 128m, 1g ...)"
+                  placeholder="Allocated memory for device. Format: xxx[b/k/m/g] (e.g., 128m, 1g ...)"
                   v-model="deviceMemory"
                 />
               </div>
@@ -268,7 +280,7 @@
                 <input
                   class="form-control"
                   type="text"
-                  placeholder="Device CPU share (e.g., 0.5, 1.5, 2...)."
+                  placeholder="Allocated CPU shares (e.g., 0.5, 1.5, 2...)."
                   v-model="deviceCPUShare"
                 />
               </div>
@@ -360,7 +372,7 @@
             </div>
           </div>
           <div class="alert alert-muted">
-            <b>Please note:</b>
+            <b>Note:</b>
             Device name must be unique. Kathara cannot have two devices with the
             same name. Fields with (*) are mandatory. Otherwise, they are
             optional.
@@ -562,6 +574,7 @@ const eventHandlers: vNG.EventHandlers = {
         deviceName.value = nodes[clickedNode.node].name!;
         deviceDockerImage.value = nodes[clickedNode.node].docker_image;
         deviceStartupScript.value = nodes[clickedNode.node].startup_script;
+        deviceShutdownScript.value= nodes[clickedNode.node].shutdown_script;
         deviceMemory.value = nodes[clickedNode.node].memory;
         deviceCPUShare.value = nodes[clickedNode.node].cpus;
         deviceBridgeEnabled.value = nodes[clickedNode.node].bridged;
@@ -638,6 +651,7 @@ const editedNode = ref("");
 const deviceName = ref("");
 const deviceDockerImage = ref("");
 const deviceStartupScript = ref("");
+const deviceShutdownScript = ref("");
 const deviceMemory = ref("");
 const deviceCPUShare = ref(1);
 const deviceBridgeEnabled = ref(false);
@@ -729,6 +743,10 @@ const addEditNetworkDevice = () => {
         deviceStartupScript.value !== ""
           ? deviceStartupScript.value
           : undefined,
+      shutdown_script:
+          deviceShutdownScript.value !== ""
+              ? deviceShutdownScript.value
+              : undefined,
       memory: deviceMemory.value !== "" ? deviceMemory.value : undefined,
       cpus: deviceCPUShare.value !== 1 ? deviceCPUShare.value : undefined,
       bridged: deviceBridgeEnabled.value,
@@ -749,6 +767,8 @@ const addEditNetworkDevice = () => {
     nodes[editedNode.value].docker_image = deviceDockerImage.value;
     nodes[editedNode.value].startup_script =
       deviceStartupScript.value !== "" ? deviceStartupScript.value : undefined;
+    nodes[editedNode.value].shutdown_script =
+        deviceShutdownScript.value !== "" ? deviceShutdownScript.value : undefined;
     nodes[editedNode.value].memory =
       deviceMemory.value !== "" ? deviceMemory.value : undefined;
     nodes[editedNode.value].cpus =

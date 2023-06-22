@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import type {Layouts} from "v-network-graph";
 import type {CollisionDomain, DeviceInterface, GraphLink, NetworkDevice,} from "@/models/graph-models";
 
-import type {KatharaLab, LabDevice, Network} from "@/models/lab-models";
+import type {KatharaLab, LabDevice, MountedFile, Network} from "@/models/lab-models";
 
 export type RootState = {
   nodes: Record<string, CollisionDomain | NetworkDevice>;
@@ -125,6 +125,29 @@ export const useGraphStore = defineStore("graph", {
 
       if (node.ipv6) {
         labDevice.ipv6 = node.ipv6;
+      }
+
+      if (node.env && node.env !== "") {
+        labDevice.env = node.env.split("\n");
+      }
+
+      let scriptFiles: MountedFile[] = [];
+      if (node.startup_script && node.startup_script !== "") {
+        scriptFiles.push({
+          name: `${node_name}.startup`,
+          content: node.startup_script
+        })
+      }
+
+      if (node.shutdown_script && node.shutdown_script !== "") {
+        scriptFiles.push({
+          name: `${node_name}.shutdown`,
+          content: node.shutdown_script
+        })
+      }
+
+      if (Array.isArray(scriptFiles)) {
+        labDevice.files = Array.from(scriptFiles);
       }
 
       return labDevice;
