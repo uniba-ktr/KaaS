@@ -3,7 +3,7 @@ import axios from "axios";
 // const AUTH_API_VERSION_PREFIX = "/api/v1";
 
 const kathara_api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: import.meta.env.VITE_KATHARA_API_URL,
   headers: {
     Accept: "application/json",
     "Content-type": "application/json; charset=utf-8",

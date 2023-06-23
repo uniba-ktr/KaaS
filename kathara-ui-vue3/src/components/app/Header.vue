@@ -3,6 +3,7 @@ import { useAppOptionStore } from "@/stores/app-option";
 import { RouterLink } from "vue-router";
 
 const appOption = useAppOptionStore();
+const app_title = import.meta.env.VITE_APP_TITLE;
 const notificationData = [
   {
     icon: "bi bi-bag text-theme",
@@ -88,7 +89,7 @@ function checkForm(event) {
         <span class="brand-img">
           <span class="brand-img-text text-theme">KE</span>
         </span>
-        <span class="brand-text">Kathara Editor</span>
+        <span class="brand-text">{{ app_title }}</span>
       </RouterLink>
     </div>
     <!-- END brand -->

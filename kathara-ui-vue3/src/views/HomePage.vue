@@ -484,6 +484,9 @@ import type {
 
 import * as vNG from "v-network-graph";
 
+// worker
+import myWorker from "@/frontend-worker";
+
 // get pinia graph store
 const graphStore = useGraphStore();
 
@@ -938,7 +941,7 @@ const showLabJson = () => {
 };
 
 const createLab = () => {
-  console.log("Try creating Kathara lab from current settings...");
+  myWorker.send("Hello worker!").then((reply: any) => console.log(reply));
 }
 
 </script>
