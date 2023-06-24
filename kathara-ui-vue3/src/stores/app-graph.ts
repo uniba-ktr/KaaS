@@ -3,6 +3,9 @@ import type {Layouts} from "v-network-graph";
 import type {CollisionDomain, DeviceInterface, GraphLink, NetworkDevice,} from "@/models/graph-models";
 
 import type {KatharaLab, LabDevice, MountedFile, Network} from "@/models/lab-models";
+import type {ApiResponse} from "@/models/api-models";
+import { Convert } from "@/support/convertHelper";
+import {kathara_api} from "@/support/httpCommon";
 
 export type RootState = {
   nodes: Record<string, CollisionDomain | NetworkDevice>;
@@ -161,6 +164,11 @@ export const useGraphStore = defineStore("graph", {
         })
       }
       return deviceNetworks;
+    },
+    async createLab(lab: KatharaLab): Promise<string> {
+      return await kathara_api
+          .post(`/lcreate`, lab)
+          .then(resp => resp.data);
     }
   },
   getters: {

@@ -475,6 +475,8 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { useGraphStore } from "@/stores/app-graph";
+import {useLabStore} from "@/stores/app-lab";
+
 import type {
   DeviceInterface,
   CollisionDomain,
@@ -486,9 +488,12 @@ import * as vNG from "v-network-graph";
 
 // worker
 import myWorker from "@/frontend-worker";
+import type {ApiResponse} from "@/models/api-models";
+import {Convert} from "@/support/convertHelper";
 
-// get pinia graph store
+// get pinia stores
 const graphStore = useGraphStore();
+const labStore = useLabStore();
 
 // v-network-graph variables
 const nodes = graphStore.nodes;
@@ -545,6 +550,9 @@ const configs = reactive(
     },
   })
 );
+
+// kathara lab variables
+const katharaLab = labStore.katharaLab;
 
 // preload position
 // onMounted(() => createLayout());
@@ -940,8 +948,12 @@ const showLabJson = () => {
   console.log(lab_json);
 };
 
-const createLab = () => {
-  myWorker.send("Hello worker!").then((reply: any) => console.log(reply));
+const createLab = async () => {
+  // myWorker.send("Hello worker!").then((reply: any) => console.log(reply));
+  await graphStore.createLab(graphStore.convertGraphToJson())
+      .then((data) => {
+        console.log(Convert.toApiResponse(JSON.stringify(data)));
+      })
 }
 
 </script>
