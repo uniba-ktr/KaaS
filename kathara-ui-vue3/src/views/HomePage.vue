@@ -4,29 +4,16 @@
     <li class="breadcrumb-item active">HOME PAGE</li>
   </ul>
   <h1 class="page-header">
-    Kathara network <small>build your topology here</small>
+    KaaS <small>build your topology here</small>
   </h1>
   <p>
-    <button
-        type="button"
-        class="btn btn-success mb-1 me-1 btn-lg"
-        @click="createLab"
-    >
-      Create Kathara Lab
-    </button>
-    <button
-      type="button"
-      class="btn btn-warning mb-1 me-1 btn-lg"
-      @click="showLabJson"
-    >
-      Show lab json
-    </button>
     <button
       type="button"
       class="btn btn-pink mb-1 me-1 btn-lg"
       data-bs-toggle="modal"
       data-bs-target="#modalCollisionDomain"
       id="openCollisionDomainModal"
+      :disabled="labState !== LabState.EDITING"
     >
       Add Collision Domain
     </button>
@@ -36,39 +23,56 @@
       data-bs-toggle="modal"
       data-bs-target="#modalNetworkDevice"
       id="openNetworkDeviceModal"
+      :disabled="labState !== LabState.EDITING"
     >
       Add Network Device
     </button>
-  </p>
-  <p>
     <button
-      type="button"
-      class="btn btn-lg me-1 btn-success"
-      :disabled="!isEdgeEligible(selectedNodes)"
-      data-bs-toggle="modal"
-      data-bs-target="#modalEdge"
-      @click="openEdgeModal(true)"
+        type="button"
+        class="btn btn-lg me-1 btn-success"
+        :disabled="!isEdgeEligible(selectedNodes)"
+        data-bs-toggle="modal"
+        data-bs-target="#modalEdge"
+        @click="openEdgeModal(true)"
     >
       Add link
     </button>
     <button
-      type="button"
-      class="btn btn-lg me-1 btn-success"
-      :disabled="selectedEdges.length === 0"
-      data-bs-toggle="modal"
-      data-bs-target="#modalEdge"
-      @click="openEdgeModal(false)"
+        type="button"
+        class="btn btn-lg me-1 btn-success"
+        :disabled="labState !== LabState.EDITING || selectedEdges.length === 0"
+        data-bs-toggle="modal"
+        data-bs-target="#modalEdge"
+        @click="openEdgeModal(false)"
     >
       Edit link
     </button>
     <button
-      type="button"
-      class="btn btn-lg me-1 btn-danger"
-      :disabled="selectedEdges.length === 0"
-      @click="removeEdge"
+        type="button"
+        class="btn btn-lg me-1 btn-danger"
+        :disabled="labState !== LabState.EDITING || selectedEdges.length === 0"
+        @click="removeEdge"
     >
       Remove link
     </button>
+    <button
+        type="button"
+        class="btn btn-warning mb-1 me-1 btn-lg"
+        @click="showGraphJson"
+    >
+      Show graph in json
+    </button>
+  </p>
+  <p>
+    <button
+        type="button"
+        class="btn btn-success mb-1 me-1 btn-lg"
+        @click="createLab"
+        :disabled="labState !== LabState.EDITING"
+    >
+      Create Kathara Lab
+    </button>
+
   </p>
   <v-network-graph
     class="graph"
@@ -76,7 +80,7 @@
     v-model:selected-edges="selectedEdges"
     :nodes="nodes"
     :edges="edges"
-    :layouts="layouts"
+    :layouts="layout"
     :configs="configs"
     :event-handlers="eventHandlers"
   >
@@ -473,34 +477,26 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
-import { useGraphStore } from "@/stores/app-graph";
+import {reactive, ref} from "vue";
+import {storeToRefs} from "pinia";
+import {useGraphStore} from "@/stores/app-graph";
 import {useLabStore} from "@/stores/app-lab";
 
-import type {
-  DeviceInterface,
-  CollisionDomain,
-  NetworkDevice,
-  GraphLink,
-} from "@/models/graph-models";
+import type {CollisionDomain, DeviceInterface, NetworkDevice,} from "@/models/graph-models";
 
 import * as vNG from "v-network-graph";
 
 // worker
-import myWorker from "@/frontend-worker";
-import type {ApiResponse} from "@/models/api-models";
 import {Convert} from "@/support/convertHelper";
+import {LabState} from "@/models/lab-states";
 
 // get pinia stores
-const graphStore = useGraphStore();
 const labStore = useLabStore();
 
 // v-network-graph variables
-const nodes = graphStore.nodes;
+const { nodes, edges, layout } = storeToRefs(useGraphStore());
 
-const edges = graphStore.edges;
-
-const layouts = graphStore.layout;
+const { updateNodePosition } = useGraphStore();
 
 const configs = reactive(
   vNG.defineConfigs({
@@ -551,8 +547,8 @@ const configs = reactive(
   })
 );
 
-// kathara lab variables
-const katharaLab = labStore.katharaLab;
+// lab variables
+const { katharaLab, currentState: labState } = storeToRefs(useLabStore());
 
 // preload position
 // onMounted(() => createLayout());
@@ -576,7 +572,7 @@ const eventHandlers: vNG.EventHandlers = {
         draggedNode[draggedNodeId].x
       )} and y-pos: ${JSON.stringify(draggedNode[draggedNodeId].y)}`
     );
-    graphStore.updateNodePosition(draggedNodeId,
+    updateNodePosition(draggedNodeId,
       draggedNode[draggedNodeId].x,
       draggedNode[draggedNodeId].y);
     //nodes[draggedNodeId].pos_X = draggedNode[draggedNodeId].x;
@@ -586,21 +582,21 @@ const eventHandlers: vNG.EventHandlers = {
     if (clickedNode.event.detail == 2) {
       //console.log(`Click on ${JSON.stringify(clickedNode)}`);
       nodeMode.value = false;
-      if (nodes[clickedNode.node].node_type === "network_device") {
+      if (nodes.value[clickedNode.node].node_type === "network_device") {
         editedNode.value = clickedNode.node;
-        selectedDeviceType.value = nodes[clickedNode.node].type;
-        deviceName.value = nodes[clickedNode.node].name!;
-        deviceDockerImage.value = nodes[clickedNode.node].docker_image;
-        deviceStartupScript.value = nodes[clickedNode.node].startup_script;
-        deviceShutdownScript.value= nodes[clickedNode.node].shutdown_script;
-        deviceMemory.value = nodes[clickedNode.node].memory;
-        deviceCPUShare.value = nodes[clickedNode.node].cpus;
-        deviceBridgeEnabled.value = nodes[clickedNode.node].bridged;
-        deviceIPv6Enabled.value = nodes[clickedNode.node].ipv6;
-        deviceExecCmds.value = nodes[clickedNode.node].exec;
-        deviceSysctlOptions.value = nodes[clickedNode.node].sysctl;
-        deviceEnv.value = nodes[clickedNode.node].env;
-        deviceShell.value = nodes[clickedNode.node].shell;
+        selectedDeviceType.value = nodes.value[clickedNode.node].type;
+        deviceName.value = nodes.value[clickedNode.node].name!;
+        deviceDockerImage.value = nodes.value[clickedNode.node].docker_image;
+        deviceStartupScript.value = nodes.value[clickedNode.node].startup_script;
+        deviceShutdownScript.value= nodes.value[clickedNode.node].shutdown_script;
+        deviceMemory.value = nodes.value[clickedNode.node].memory;
+        deviceCPUShare.value = nodes.value[clickedNode.node].cpus;
+        deviceBridgeEnabled.value = nodes.value[clickedNode.node].bridged;
+        deviceIPv6Enabled.value = nodes.value[clickedNode.node].ipv6;
+        deviceExecCmds.value = nodes.value[clickedNode.node].exec;
+        deviceSysctlOptions.value = nodes.value[clickedNode.node].sysctl;
+        deviceEnv.value = nodes.value[clickedNode.node].env;
+        deviceShell.value = nodes.value[clickedNode.node].shell;
         //console.log(`editedNode = ${editedNode.value}`);
         document.getElementById("openNetworkDeviceModal")!.click();
       }
@@ -620,19 +616,19 @@ const eventHandlers: vNG.EventHandlers = {
     // update the selectedCD
     if (
       selectedNodes.length === 1 &&
-      nodes[selectedNodes[0]].node_type === "collision_domain"
+        nodes.value[selectedNodes[0]].node_type === "collision_domain"
     ) {
-      selectedCDValue.value = nodes[selectedNodes[0]].code;
+      selectedCDValue.value = nodes.value[selectedNodes[0]].code;
       //console.log(`Update CD value to ${selectedCDValue.value}`);
     }
     if (selectedNodes.length === 2) {
       if (
-        nodes[selectedNodes[0]].node_type !== nodes[selectedNodes[1]].node_type
+          nodes.value[selectedNodes[0]].node_type !== nodes.value[selectedNodes[1]].node_type
       ) {
         selectedCDValue.value =
-          nodes[selectedNodes[0]].node_type === "collision_domain"
-            ? nodes[selectedNodes[0]].code
-            : nodes[selectedNodes[1]].code;
+            nodes.value[selectedNodes[0]].node_type === "collision_domain"
+            ? nodes.value[selectedNodes[0]].code
+            : nodes.value[selectedNodes[1]].code;
         //console.log(`Update CD value to ${selectedCDValue.value}`);
       }
     }
@@ -641,13 +637,12 @@ const eventHandlers: vNG.EventHandlers = {
     if (selectedEdges.length === 0) return;
     //console.log(`Select the edge: ${JSON.stringify(selectedEdges)}`);
     edgeMode = false;
-    selectedDeviceInterfaceIndex.value = edges[selectedEdges[0]].info.index;
-    selectedCDValue.value = edges[selectedEdges[0]].info.cd;
+    selectedDeviceInterfaceIndex.value = edges.value[selectedEdges[0]].info.index;
+    selectedCDValue.value = edges.value[selectedEdges[0]].info.cd;
   },
 };
 
-// kathara system
-const katharaMode = ref("editing");
+// v-network-graph system
 const selectedNodes = ref<string[]>([]);
 const selectedEdges = ref<string[]>([]);
 const nextCDIndex = ref(
@@ -722,7 +717,7 @@ const addEditCollisionDomain = () => {
       // pos_Y: 100,
     };
     const nodeId = `cd_${newCdCode.value}`;
-    nodes[nodeId] = newCollisionDomain;
+    nodes.value[nodeId] = newCollisionDomain;
     usedCdCodes.value.push(newCdCode.value);
     document.getElementById("closeModalCollisionDomain")!.click();
   }
@@ -780,26 +775,26 @@ const addEditNetworkDevice = () => {
       // pos_Y: 100,
     };
     const nodeId = deviceName.value;
-    nodes[nodeId] = newNetworkDevice;
+    nodes.value[nodeId] = newNetworkDevice;
   } else {
-    nodes[editedNode.value].docker_image = deviceDockerImage.value;
-    nodes[editedNode.value].startup_script =
+    nodes.value[editedNode.value].docker_image = deviceDockerImage.value;
+    nodes.value[editedNode.value].startup_script =
       deviceStartupScript.value !== "" ? deviceStartupScript.value : undefined;
-    nodes[editedNode.value].shutdown_script =
+    nodes.value[editedNode.value].shutdown_script =
         deviceShutdownScript.value !== "" ? deviceShutdownScript.value : undefined;
-    nodes[editedNode.value].memory =
+    nodes.value[editedNode.value].memory =
       deviceMemory.value !== "" ? deviceMemory.value : undefined;
-    nodes[editedNode.value].cpus =
+    nodes.value[editedNode.value].cpus =
       deviceCPUShare.value !== 1 ? deviceCPUShare.value : undefined;
-    nodes[editedNode.value].bridged = deviceBridgeEnabled.value;
-    nodes[editedNode.value].ipv6 = deviceIPv6Enabled.value;
-    nodes[editedNode.value].exec =
+    nodes.value[editedNode.value].bridged = deviceBridgeEnabled.value;
+    nodes.value[editedNode.value].ipv6 = deviceIPv6Enabled.value;
+    nodes.value[editedNode.value].exec =
       deviceExecCmds.value !== "" ? deviceExecCmds.value : undefined;
-    nodes[editedNode.value].sysctl =
+    nodes.value[editedNode.value].sysctl =
       deviceSysctlOptions.value !== "" ? deviceSysctlOptions.value : undefined;
-    nodes[editedNode.value].env =
+    nodes.value[editedNode.value].env =
       deviceEnv.value !== "" ? deviceEnv.value : undefined;
-    nodes[editedNode.value].shell =
+    nodes.value[editedNode.value].shell =
       deviceShell.value !== "" ? deviceShell.value : undefined;
     console.log("Update the selected network device");
   }
@@ -828,9 +823,10 @@ const selectedCDValue = ref("");
 
 const isEdgeEligible = (selected: string[]): boolean => {
   if (selected.length !== 2) return false;
+  if (labState.value !== LabState.EDITING) return false;
   const sourceName = selected[0];
   const targetName = selected[1];
-  return nodes[sourceName].node_type !== nodes[targetName].node_type;
+  return nodes.value[sourceName].node_type !== nodes.value[targetName].node_type;
 };
 
 const openEdgeModal = (mode: boolean) => {
@@ -843,22 +839,22 @@ const addEditEdge = () => {
     const [sourceName, targetName] = selectedNodes.value;
     let newDeviceInterface: DeviceInterface;
     // add new interface to device
-    if (nodes[sourceName].node_type === "network_device") {
+    if (nodes.value[sourceName].node_type === "network_device") {
       newDeviceInterface = {
         index: selectedDeviceInterfaceIndex.value,
-        cd: nodes[targetName].code,
+        cd: nodes.value[targetName].code,
       };
-      nodes[sourceName].interfaces.push(newDeviceInterface);
+      nodes.value[sourceName].interfaces.push(newDeviceInterface);
     } else {
       newDeviceInterface = {
         index: selectedDeviceInterfaceIndex.value,
-        cd: nodes[sourceName].code,
+        cd: nodes.value[sourceName].code,
       };
-      nodes[targetName].interfaces.push(newDeviceInterface);
+      nodes.value[targetName].interfaces.push(newDeviceInterface);
     }
     // add edge to graph
     const edgeId = `edge${nextEdgeIndex.value}`;
-    edges[edgeId] = {
+    edges.value[edgeId] = {
       source: sourceName,
       target: targetName,
       info: newDeviceInterface,
@@ -866,7 +862,7 @@ const addEditEdge = () => {
     nextEdgeIndex.value++;
   } else {
     // edit the current selected link
-    console.log(`Edit the link ${edges[selectedEdges.value[0]]}`);
+    console.log(`Edit the link ${edges.value[selectedEdges.value[0]]}`);
   }
 
   // close modal
@@ -875,8 +871,8 @@ const addEditEdge = () => {
 
 const removeEdge = () => {
   const edgeId = selectedEdges.value[0];
-  const sourceNode = nodes[edges[edgeId].source];
-  const targetNode = nodes[edges[edgeId].target];
+  const sourceNode = nodes.value[edges.value[edgeId].source];
+  const targetNode = nodes.value[edges.value[edgeId].target];
   if (sourceNode.type === "network_device") {
     const cd_value = targetNode.code;
     sourceNode.interfaces = sourceNode.interfaces.filter(
@@ -892,7 +888,7 @@ const removeEdge = () => {
       }
     );
   }
-  delete edges[edgeId];
+  delete edges.value[edgeId];
 };
 
 const onDeviceTypeChange = () => {
@@ -941,19 +937,24 @@ const onDeviceTypeChange = () => {
   }
 };
 
-const showLabJson = () => {
-  console.log(nodes);
-  console.log(edges);
-  const lab_json = graphStore.convertGraphToJson();
-  console.log(lab_json);
+const showGraphJson = () => {
+  console.log(nodes.value);
+  console.log(edges.value);
 };
 
 const createLab = async () => {
+  console.log("Updating lab...");
+  labStore.convertGraphToTopo(nodes.value);
+  console.log(katharaLab.value);
   // myWorker.send("Hello worker!").then((reply: any) => console.log(reply));
-  await graphStore.createLab(graphStore.convertGraphToJson())
+  await labStore.createLab()
       .then((data) => {
-        console.log(Convert.toApiResponse(JSON.stringify(data)));
+        const apiResp = Convert.toApiResponse(JSON.stringify(data));
+        labState.value = typeof apiResp.lab_status !== "undefined" ? apiResp.lab_status : LabState.EDITING;
       })
+      .catch((error) => {
+        console.log(error)
+      });
 }
 
 </script>
