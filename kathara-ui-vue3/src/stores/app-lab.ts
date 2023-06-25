@@ -174,6 +174,7 @@ export const useLabStore = defineStore("lab", {
         getLabTopo: (state) => state.katharaLab.topo,
         getLabState: (state) => state.currentState,
         getLabHash: (state) => state.labHash,
+        getLabMachines: (state) => state.labMachines,
     },
     persist: true,
 });

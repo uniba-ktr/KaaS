@@ -568,7 +568,7 @@ const configs = reactive(
 );
 
 // lab variables
-const { katharaLab, currentState: labState } = storeToRefs(useLabStore());
+const { katharaLab, currentState: labState, labMachines } = storeToRefs(useLabStore());
 
 watch(labState, async (value, oldValue) => {
   if (value !== oldValue) {
@@ -609,9 +609,11 @@ const eventHandlers: vNG.EventHandlers = {
   },
   "node:dblclick": (clickedNode) => {
     if (clickedNode.event.detail == 2) {
-      //console.log(`Click on ${JSON.stringify(clickedNode)}`);
-      nodeMode.value = false;
-      if (nodes.value[clickedNode.node].node_type === "network_device") {
+      //console.log(`dblclick on ${JSON.stringify(clickedNode)}`)
+      // node can only be edited when lab is in EDITING mode
+      if (labState.value === LabState.EDITING &&
+          nodes.value[clickedNode.node].node_type === "network_device") {
+        nodeMode.value = false;
         editedNode.value = clickedNode.node;
         selectedDeviceType.value = nodes.value[clickedNode.node].type;
         deviceName.value = nodes.value[clickedNode.node].name!;
@@ -628,6 +630,11 @@ const eventHandlers: vNG.EventHandlers = {
         deviceShell.value = nodes.value[clickedNode.node].shell;
         //console.log(`editedNode = ${editedNode.value}`);
         document.getElementById("openNetworkDeviceModal")!.click();
+      }
+
+      // node web-tty iframe can only be opened when lab is in RUNNING mode.
+      if (labState.value === LabState.RUNNING) {
+        console.log(`Open machine ${clickedNode.node} web-tty iframe`);
       }
     }
   },
