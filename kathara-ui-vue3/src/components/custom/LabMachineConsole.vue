@@ -1,8 +1,8 @@
 <template>
   <!-- BEGIN #webTTYholder -->
   <card id="consoles-container">
-
     <card-body>
+      <div class="text-white text-opacity-50 mb-3"><b>Device consoles</b></div>
       <div class="row">
         <div class="col-xl-6" v-for="machine in machines">
           <card class="border-theme mb-3">
