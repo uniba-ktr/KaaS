@@ -35,3 +35,8 @@ export interface MountedFile {
     location?: string;
     content: string;
 }
+
+export interface ConsoleIframe {
+    component_name: string;
+    machine_name: string;
+}

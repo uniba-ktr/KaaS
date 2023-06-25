@@ -81,15 +81,6 @@
     >
       Run Kathara Lab
     </button>
-    <button
-        type="button"
-        class="btn btn-warning mb-1 me-1 btn-lg"
-        data-bs-toggle="modal"
-        data-bs-target="#anotherIframe"
-        @click="showIframeInModal"
-    >
-      Open iframe modal
-    </button>
   </p>
   <v-network-graph
     class="graph"
@@ -503,11 +494,18 @@
     </div>
   </div>
   <!-- END #labToast -->
-  <LabMachineConsole />
+  <!-- BEGIN #draggableConsole -->
+  <component
+    v-for="(item, idx) of consoleIframeComponents"
+    :key="idx"
+    :is="mapTypeComponents[item.component_name]"
+    :machine_name="item.machine_name"
+  />
+  <!-- END #draggableConsole -->
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, watch} from "vue";
+import {reactive, ref, watch, defineAsyncComponent} from "vue";
 import {storeToRefs} from "pinia";
 import {useGraphStore} from "@/stores/app-graph";
 import {useLabStore} from "@/stores/app-lab";
@@ -520,14 +518,14 @@ import {VNetworkGraph} from "v-network-graph";
 
 // worker
 import {LabState} from "@/models/lab-states";
+import type {ConsoleIframe} from "@/models/lab-models";
 
 // get pinia stores
+const graphStore = useGraphStore();
 const labStore = useLabStore();
 
 // v-network-graph variables
-const { nodes, edges, layout } = storeToRefs(useGraphStore());
-
-const { updateNodePosition } = useGraphStore();
+const { nodes, edges, layout } = storeToRefs(graphStore);
 
 const configs = reactive(
   vNG.defineConfigs({
@@ -579,7 +577,7 @@ const configs = reactive(
 );
 
 // lab variables
-const { katharaLab, currentState: labState, labMachines } = storeToRefs(useLabStore());
+const { currentState: labState } = storeToRefs(labStore);
 
 watch(labState, async (value, oldValue) => {
   if (value !== oldValue) {
@@ -604,7 +602,10 @@ const toastMessage = ref("");
 const toastType = ref(0);
 
 // iframe variables
-const showIframe = ref(false);
+const consoleIframeComponents = ref<ConsoleIframe[]>([]);
+const mapTypeComponents = {
+  draggableConsole: defineAsyncComponent(() => import("@/components/custom/DraggableConsole.vue"))
+}
 
 const eventHandlers: vNG.EventHandlers = {
   "node:dragend": (draggedNode) => {
@@ -614,7 +615,7 @@ const eventHandlers: vNG.EventHandlers = {
         draggedNode[draggedNodeId].x
       )} and y-pos: ${JSON.stringify(draggedNode[draggedNodeId].y)}`
     );
-    updateNodePosition(draggedNodeId,
+    graphStore.updateNodePosition(draggedNodeId,
       draggedNode[draggedNodeId].x,
       draggedNode[draggedNodeId].y);
     //nodes[draggedNodeId].pos_X = draggedNode[draggedNodeId].x;
@@ -647,7 +648,14 @@ const eventHandlers: vNG.EventHandlers = {
 
       // node web-tty iframe can only be opened when lab is in RUNNING mode.
       if (labState.value === LabState.RUNNING) {
-        console.log(`Open machine ${clickedNode.node} web-tty iframe`);
+        if (!labStore.checkConsoleIframeVisibility(clickedNode.node)) {
+          console.log(`Open machine ${clickedNode.node} web-tty iframe`);
+          labStore.showMachineConsoleIframe(clickedNode.node);
+          consoleIframeComponents.value.push({
+            component_name: "draggableConsole",
+            machine_name: clickedNode.node,
+          })
+        }
       }
     }
   },
@@ -989,10 +997,6 @@ const onDeviceTypeChange = () => {
 const showToast = () => {
   const toast = new Toast(document.getElementById("lab-toast")!);
   toast.show();
-}
-
-const showIframeInModal= () => {
-  showIframe.value = !showIframe.value;
 }
 
 const showGraphJson = () => {

@@ -12,7 +12,8 @@ export type RootState = {
     katharaLab: KatharaLab;
     currentState: LabState;
     labHash: string;
-    labMachines: {[k: string]: Info}
+    labMachines: {[k: string]: Info},
+    showConsoleIframes: string[],
 };
 
 export const useLabStore = defineStore("lab", {
@@ -28,7 +29,8 @@ export const useLabStore = defineStore("lab", {
           },
           currentState: LabState.EDITING,
           labHash: "",
-          labMachines: {}
+          labMachines: {},
+          showConsoleIframes: [],
       } as RootState),
     actions: {
         convertGraphToTopo(graphNodes: Record<string, CollisionDomain | NetworkDevice>) {
@@ -163,6 +165,22 @@ export const useLabStore = defineStore("lab", {
 
                 }, 5000, shouldStopPolling)
             }, 1000)
+        },
+        checkConsoleIframeVisibility(machineName: string): boolean {
+            return this.showConsoleIframes.indexOf(machineName) > 0;
+        },
+        showMachineConsoleIframe(machineName: string) {
+            this.showConsoleIframes.push(machineName);
+        },
+        getMachineInfo(machineName: string): Info | undefined {
+            let keys = Object.keys(this.labMachines);
+
+            for (let k of keys) {
+                if (this.labMachines[k].name === machineName) {
+                    return this.labMachines[k];
+                }
+            }
+            return undefined;
         }
     },
     getters: {
@@ -175,6 +193,7 @@ export const useLabStore = defineStore("lab", {
         getLabState: (state) => state.currentState,
         getLabHash: (state) => state.labHash,
         getLabMachines: (state) => state.labMachines,
+        getShowConsoleIframes: (state) => state.showConsoleIframes,
     },
     persist: true,
 });
