@@ -22,6 +22,9 @@ import "v-network-graph/lib/style.css";
 // vue-final-modal
 import vfmPlugin from "vue-final-modal";
 
+// v-drag
+import drag from "v-drag";
+
 import App from "./App.vue";
 import router from "./router";
 
@@ -52,6 +55,8 @@ app.use(PerfectScrollbar);
 app.use(VNetworkGraph);
 // vue-final-modal
 app.use(vfmPlugin);
+// v-drag
+app.use(drag);
 
 app.config.globalProperties.emitter = emitter;
 app.mount("#app");

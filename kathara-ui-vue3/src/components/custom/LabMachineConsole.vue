@@ -1,15 +1,26 @@
 <template>
   <!-- BEGIN #webTTYholder -->
-  <div class="iframe-block" v-for="machine in machines">
-      <h4>WebTTY of {{ machine.name }}</h4>
-      <iframe
-          width="100%"
-          height="200vh"
-          :title="machine.container_name"
-          :src="`${webTTyBaseURL}/e/${machine.container_id}`"
-      >
-      </iframe>
-  </div>
+  <card id="consoles-container">
+
+    <card-body>
+      <div class="row">
+        <div class="col-xl-6" v-for="machine in machines">
+          <card class="border-theme mb-3">
+            <card-header class="border-theme text-theme fw-bold small">WebTTy of {{ machine.name }}</card-header>
+            <card-body>
+              <iframe
+                  width="100%"
+                  height="300vh"
+                  :title="machine.container_name"
+                  :src="`${webTTyBaseURL}/e/${machine.container_id}`"
+              >
+              </iframe>
+            </card-body>
+          </card>
+        </div>
+      </div>
+    </card-body>
+  </card>
   <!-- END #webTTYholder-->
 </template>
 
@@ -18,7 +29,6 @@ import {reactive, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useLabStore} from "@/stores/app-lab";
 import { Info } from "@/models/api-models"
-
 const { labMachines: machines } = storeToRefs(useLabStore());
 const webTTyBaseURL = import.meta.env.VITE_WEBTTY_API_URL;
 
@@ -31,7 +41,8 @@ watch(machines, async (value, oldValue) => {
 </script>
 
 <style scoped>
-.iframe-block {
-  margin-bottom: 30px;
+#consoles-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 </style>
