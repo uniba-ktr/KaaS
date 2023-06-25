@@ -81,6 +81,15 @@
     >
       Run Kathara Lab
     </button>
+    <button
+        type="button"
+        class="btn btn-warning mb-1 me-1 btn-lg"
+        data-bs-toggle="modal"
+        data-bs-target="#anotherIframe"
+        @click="showIframeInModal"
+    >
+      Open iframe modal
+    </button>
   </p>
   <v-network-graph
     class="graph"
@@ -494,12 +503,7 @@
     </div>
   </div>
   <!-- END #labToast -->
-  <iframe
-      width="100%"
-      height="300px"
-      src="http://localhost:8001/e/ae2a463bed55"
-  >
-  </iframe>
+  <LabMachineConsole />
 </template>
 
 <script setup lang="ts">
@@ -599,6 +603,8 @@ watch(labState, async (value, oldValue) => {
 const toastMessage = ref("");
 const toastType = ref(0);
 
+// iframe variables
+const showIframe = ref(false);
 
 const eventHandlers: vNG.EventHandlers = {
   "node:dragend": (draggedNode) => {
@@ -983,6 +989,10 @@ const onDeviceTypeChange = () => {
 const showToast = () => {
   const toast = new Toast(document.getElementById("lab-toast")!);
   toast.show();
+}
+
+const showIframeInModal= () => {
+  showIframe.value = !showIframe.value;
 }
 
 const showGraphJson = () => {
