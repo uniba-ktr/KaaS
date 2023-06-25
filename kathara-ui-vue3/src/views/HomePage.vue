@@ -494,6 +494,12 @@
     </div>
   </div>
   <!-- END #labToast -->
+  <iframe
+      width="100%"
+      height="300px"
+      src="http://localhost:8001/e/ae2a463bed55"
+  >
+  </iframe>
 </template>
 
 <script setup lang="ts">
@@ -502,6 +508,7 @@ import {storeToRefs} from "pinia";
 import {useGraphStore} from "@/stores/app-graph";
 import {useLabStore} from "@/stores/app-lab";
 import {Toast} from "bootstrap";
+import LabMachineConsole from "@/components/custom/LabMachineConsole.vue";
 import type {CollisionDomain, DeviceInterface, NetworkDevice,} from "@/models/graph-models";
 
 import * as vNG from "v-network-graph";
@@ -577,12 +584,12 @@ watch(labState, async (value, oldValue) => {
       showToast();
     }
     if (oldValue === LabState.CREATED && value === LabState.STARTING) {
-      toastMessage.value = "Lab starting...";
+      toastMessage.value = "Lab is starting...";
       showToast();
     }
 
     if (oldValue === LabState.STARTING && value === LabState.RUNNING) {
-      toastMessage.value = "Lab running...";
+      toastMessage.value = "Lab is running...";
       showToast();
     }
   }
