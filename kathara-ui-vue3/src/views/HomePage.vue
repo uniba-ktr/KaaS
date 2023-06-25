@@ -76,10 +76,10 @@
     <button
         type="button"
         class="btn btn-primary mb-1 me-1 btn-lg"
-        @click="startLab"
+        @click="runLab"
         :disabled="labState !== LabState.CREATED"
     >
-      Start Kathara Lab
+      Run Kathara Lab
     </button>
   </p>
   <v-network-graph
@@ -982,8 +982,8 @@ const createLab = async () => {
   await labStore.createLab();
 }
 
-const startLab = async () => {
-  await labStore.startLab();
+const runLab = async () => {
+  await labStore.runLab();
 }
 
 </script>

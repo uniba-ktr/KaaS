@@ -119,7 +119,7 @@ export const useLabStore = defineStore("lab", {
             this.labHash = typeof apiResponse.lab_hash !== "undefined" ?
                 apiResponse.lab_hash : "";
         },
-        async startLab() {
+        async runLab() {
             const resp = await kathara_api
                 .post(`/lstart`, {
                     lab_name: this.getLabName
