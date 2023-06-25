@@ -97,7 +97,8 @@
           },
           "files": { "$ref": "file:../res/schemas/files.json"}
         }
-      }
+      },
+      "minContains": 1
     },
     "shared": {
       "type": "object",

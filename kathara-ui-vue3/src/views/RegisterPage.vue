@@ -19,14 +19,14 @@
           <input
             type="text"
             class="form-control form-control-lg bg-white bg-opacity-5"
-            :class="!validName() && nameBlured ? 'is-invalid' : ''"
+            :class="!validName() && nameBlurred ? 'is-invalid' : ''"
             placeholder="e.g John Smith"
             v-model="name"
           />
           <div
             class="invalid-feedback"
             id="validationInvalidInputFeedback"
-            v-if="nameBlured"
+            v-if="nameBlurred"
           >
             Please provide a name
           </div>
@@ -104,7 +104,7 @@ const appOption = useAppOptionStore();
 const $router = useRouter();
 
 const name = ref("");
-const nameBlured = ref(false);
+const nameBlurred = ref(false);
 const valid = ref(false);
 const submitted = ref(false);
 
@@ -121,10 +121,10 @@ onUnmounted(() => {
 });
 
 const validate = () => {
-  nameBlured.value = true;
+  nameBlurred.value = true;
   if (validName()) {
     valid.value = true;
-    nameBlured.value = false;
+    nameBlurred.value = false;
   }
 };
 

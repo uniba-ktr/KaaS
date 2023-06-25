@@ -1,17 +1,20 @@
 import PromiseWorker from "promise-worker";
 import MyWorker from './worker?worker';
-import type {LabCreationRequest} from "@/models/api-models";
+import type {
+    LabCreationRequest,
+    LabInfoRequest
+} from "@/models/api-models";
 import {RequestType} from "@/models/api-models";
 
 const worker = new MyWorker()
 const promiseWorker = new PromiseWorker(worker);
 
-const createKatharaLab = (request: LabCreationRequest) =>
+const checkLabInfo = (request: LabInfoRequest) =>
     promiseWorker.postMessage({
-        type: RequestType.CREATE_LAB,
-        data: request.lab
+        type: RequestType.GET_LAB_INFO,
+        data: request
     })
 
 export default {
-    createKatharaLab,
+    checkLabInfo,
 };

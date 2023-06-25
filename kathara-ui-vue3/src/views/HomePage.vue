@@ -72,7 +72,6 @@
     >
       Create Kathara Lab
     </button>
-
   </p>
   <v-network-graph
     class="graph"
@@ -474,17 +473,30 @@
     </div>
   </div>
   <!-- END #modalCollisionDomain -->
+  <!-- BEGIN #labToast -->
+  <div class="toasts-container">
+    <div :class="['toast', 'text-black', 'bg-info']" data-autohide="false" id="lab-toast">
+      <div class="d-flex">
+        <div class="toast-body">
+          {{ toastMessage }}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  <!-- END #labToast -->
 </template>
 
 <script setup lang="ts">
-import {reactive, ref} from "vue";
+import {reactive, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useGraphStore} from "@/stores/app-graph";
 import {useLabStore} from "@/stores/app-lab";
-
+import {Toast} from "bootstrap";
 import type {CollisionDomain, DeviceInterface, NetworkDevice,} from "@/models/graph-models";
 
 import * as vNG from "v-network-graph";
+import {VNetworkGraph} from "v-network-graph";
 
 // worker
 import {Convert} from "@/support/convertHelper";
@@ -550,19 +562,18 @@ const configs = reactive(
 // lab variables
 const { katharaLab, currentState: labState } = storeToRefs(useLabStore());
 
-// preload position
-// onMounted(() => createLayout());
+watch(labState, async (value, oldValue) => {
+  if (value !== oldValue) {
+    if (oldValue === LabState.EDITING && value === LabState.SUBMITTED) {
+      toastMessage.value = "Successfully submitted lab...";
+      toast.show();
+    }
+  }
+})
 
-/*
-function createLayout() {
-  Object.keys(nodes).forEach((nodeId: string) => {
-    const x = nodes[nodeId].pos_X;
-    const y = nodes[nodeId].pos_Y;
-    layouts.nodes[nodeId] = { x, y };
-  });
-  console.log("createLayout() called...")
-}
-*/
+// toast variables
+const toastMessage = ref("");
+const toast = new Toast(document.getElementById("lab-toast")!);
 
 const eventHandlers: vNG.EventHandlers = {
   "node:dragend": (draggedNode) => {
@@ -947,14 +958,7 @@ const createLab = async () => {
   labStore.convertGraphToTopo(nodes.value);
   console.log(katharaLab.value);
   // myWorker.send("Hello worker!").then((reply: any) => console.log(reply));
-  await labStore.createLab()
-      .then((data) => {
-        const apiResp = Convert.toApiResponse(JSON.stringify(data));
-        labState.value = typeof apiResp.lab_status !== "undefined" ? apiResp.lab_status : LabState.EDITING;
-      })
-      .catch((error) => {
-        console.log(error)
-      });
+  await labStore.createLab();
 }
 
 </script>

@@ -3,7 +3,7 @@ import { useAppOptionStore } from "@/stores/app-option";
 import { useAppVariableStore } from "@/stores/app-variable";
 import { onMounted } from "vue";
 import { Tooltip } from "bootstrap";
-import useEmitter from "@/composables/useEmitter";
+import {useEmitter} from "@/composables/useEmitter";
 
 const appOption = useAppOptionStore();
 const appVariable = useAppVariableStore();

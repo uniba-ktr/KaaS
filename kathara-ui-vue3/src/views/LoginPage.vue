@@ -15,11 +15,11 @@
           <input
             type="text"
             class="form-control form-control-lg bg-white bg-opacity-5"
-            :class="!requiredText(authPayload.username) && usernameBlured ? 'is-invalid': ''"
+            :class="!requiredText(authPayload.username) && usernameBlurred ? 'is-invalid': ''"
             placeholder=""
             v-model="authPayload.username"
           />
-          <div class="invalid-feedback" v-if="usernameBlured">
+          <div class="invalid-feedback" v-if="usernameBlurred">
             Please provide a username
           </div>
         </div>
@@ -37,11 +37,11 @@
           <input
             type="password"
             class="form-control form-control-lg bg-white bg-opacity-5"
-            :class="!requiredText(authPayload.password) && passwordBlured ? 'is-invalid' : ''"
+            :class="!requiredText(authPayload.password) && passwordBlurred ? 'is-invalid' : ''"
             placeholder=""
             v-model="authPayload.password"
           />
-          <div class="invalid-feedback" v-if="passwordBlured">
+          <div class="invalid-feedback" v-if="passwordBlurred">
             Please provide a password
           </div>
         </div>
@@ -80,7 +80,7 @@ import { onMounted, onUnmounted, ref, reactive } from "vue";
 import { useAppOptionStore } from "@/stores/app-option";
 import { useRoute, useRouter } from "vue-router";
 // internal
-import { requiredText, minLength } from "@/support/fieldRuleHelper";
+import { requiredText } from "@/support/fieldRuleHelper";
 import type { IAuthRequestPayload } from "@/models/auth-models";
 import { useAuthStore } from "@/stores/app-auth";
 

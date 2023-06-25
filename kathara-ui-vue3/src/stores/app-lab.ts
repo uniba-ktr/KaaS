@@ -1,9 +1,10 @@
 import {defineStore} from "pinia";
-import type {KatharaLab} from "@/models/lab-models";
+import type {KatharaLab, LabDevice, MountedFile, Network} from "@/models/lab-models";
 import {LabState} from "@/models/lab-states";
-import type {LabDevice, MountedFile, Network} from "@/models/lab-models";
-import type {DeviceInterface, NetworkDevice, CollisionDomain} from "@/models/graph-models";
+import type {CollisionDomain, DeviceInterface, NetworkDevice} from "@/models/graph-models";
 import {kathara_api} from "@/support/httpCommon";
+import {Convert} from "@/support/convertHelper";
+import type {ApiResponse} from "@/models/api-models";
 
 export type RootState = {
     katharaLab: KatharaLab;
@@ -98,10 +99,17 @@ export const useLabStore = defineStore("lab", {
             }
             return deviceNetworks;
         },
-        async createLab(): Promise<string> {
-            return await kathara_api
+        async createLab() {
+            const resp = await kathara_api
                 .post(`/lcreate`, this.katharaLab)
                 .then(resp => resp.data);
+
+            const apiResponse: ApiResponse = Convert.toApiResponse(JSON.stringify(resp));
+
+            this.currentState = typeof apiResponse.lab_status !== "undefined" ?
+                apiResponse.lab_status : LabState.EDITING;
+
+
         }
     },
     getters: {
