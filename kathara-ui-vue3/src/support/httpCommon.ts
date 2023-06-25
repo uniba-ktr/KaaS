@@ -4,7 +4,7 @@ import axios from "axios";
 
 const kathara_api = axios.create({
   baseURL: import.meta.env.VITE_KATHARA_API_URL,
-  timeout: 5000, // Set a default timeout of 5 seconds
+  // timeout: 5000, // Set a default timeout of 5 seconds
   headers: {
     Accept: "application/json",
     "Content-type": "application/json; charset=utf-8",

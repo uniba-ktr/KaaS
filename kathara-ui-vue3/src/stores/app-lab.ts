@@ -4,11 +4,15 @@ import {LabState} from "@/models/lab-states";
 import type {CollisionDomain, DeviceInterface, NetworkDevice} from "@/models/graph-models";
 import {kathara_api} from "@/support/httpCommon";
 import {Convert} from "@/support/convertHelper";
-import type {ApiResponse} from "@/models/api-models";
+import type { Info, ApiResponse} from "@/models/api-models";
+
+import {poll} from "poll";
 
 export type RootState = {
     katharaLab: KatharaLab;
     currentState: LabState;
+    labHash: string;
+    labMachines: {[k: string]: Info}
 };
 
 export const useLabStore = defineStore("lab", {
@@ -23,6 +27,8 @@ export const useLabStore = defineStore("lab", {
             topo: [],
           },
           currentState: LabState.EDITING,
+          labHash: "",
+          labMachines: {}
       } as RootState),
     actions: {
         convertGraphToTopo(graphNodes: Record<string, CollisionDomain | NetworkDevice>) {
@@ -106,10 +112,57 @@ export const useLabStore = defineStore("lab", {
 
             const apiResponse: ApiResponse = Convert.toApiResponse(JSON.stringify(resp));
 
+            // NOTE: jumping from submitted ==> created
             this.currentState = typeof apiResponse.lab_status !== "undefined" ?
-                apiResponse.lab_status : LabState.EDITING;
+                LabState.CREATED : LabState.EDITING;
 
+            this.labHash = typeof apiResponse.lab_hash !== "undefined" ?
+                apiResponse.lab_hash : "";
+        },
+        async startLab() {
+            const resp = await kathara_api
+                .post(`/lstart`, {
+                    lab_name: this.getLabName
+                })
+                .then((resp) => resp.data)
 
+            const apiResponse: ApiResponse = Convert.toApiResponse(JSON.stringify(resp));
+
+            if (apiResponse.success) {
+                this.currentState = LabState.STARTING;
+            }
+
+            // begin to polling for lab create
+            let stopPolling = false;
+            const shouldStopPolling = () => stopPolling
+
+            setTimeout(async () => {
+                await poll(async () => {
+                    const resp = await kathara_api
+                        .post(`/linfo`, {
+                            lab_name: this.getLabName,
+                            lab_hash: this.getLabHash,
+                        })
+                        .then((resp) => {
+                            const apiResponse: ApiResponse = Convert.toApiResponse(JSON.stringify(resp.data));
+                            if (apiResponse.info) {
+                                stopPolling = true;
+                            }
+
+                            return apiResponse;
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return err;
+                        })
+
+                    if (resp.info) {
+                        this.currentState = LabState.RUNNING;
+                        this.labMachines = resp.info;
+                    }
+
+                }, 5000, shouldStopPolling)
+            }, 1000)
         }
     },
     getters: {
@@ -120,6 +173,7 @@ export const useLabStore = defineStore("lab", {
         getLabEmail: (state) => state.katharaLab.email,
         getLabTopo: (state) => state.katharaLab.topo,
         getLabState: (state) => state.currentState,
+        getLabHash: (state) => state.labHash,
     },
     persist: true,
 });

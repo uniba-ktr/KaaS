@@ -13,9 +13,10 @@ interface BaseProperty {
     lab_name: string;
 }
 
-interface Info {
+export interface Info {
     network_scenario_id: string;
     name:                string;
+    container_id:        string;
     container_name:      string;
     user:                string;
     status:              string;

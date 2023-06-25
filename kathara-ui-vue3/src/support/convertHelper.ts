@@ -167,13 +167,14 @@ const typeMap: any = {
     "ApiResponse": o([
         { json: "lab_name", js: "lab_name", typ: u(undefined, "") },
         { json: "lab_hash", js: "lab_hash", typ: u(undefined, "") },
-        { json: "lab_status", js: "lab_status", typ: u(undefined, "") },
+        { json: "lab_status", js: "lab_status", typ: u([undefined, null], "") },
         { json: "success", js: "success", typ: u([undefined, null], true) },
         { json: "info", js: "info", typ: u([undefined, null], m(r("Info"))) },
     ], false),
     "Info": o([
         { json: "network_scenario_id", js: "network_scenario_id", typ: u(undefined, "") },
         { json: "name", js: "name", typ: u(undefined, "") },
+        { json: "container_id", js: "container_id", typ: u(undefined, "") },
         { json: "container_name", js: "container_name", typ: u(undefined, "") },
         { json: "user", js: "user", typ: u(undefined, "") },
         { json: "status", js: "status", typ: u(undefined, "") },

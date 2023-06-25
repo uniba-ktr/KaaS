@@ -72,6 +72,15 @@
     >
       Create Kathara Lab
     </button>
+
+    <button
+        type="button"
+        class="btn btn-primary mb-1 me-1 btn-lg"
+        @click="startLab"
+        :disabled="labState !== LabState.CREATED"
+    >
+      Start Kathara Lab
+    </button>
   </p>
   <v-network-graph
     class="graph"
@@ -475,7 +484,7 @@
   <!-- END #modalCollisionDomain -->
   <!-- BEGIN #labToast -->
   <div class="toasts-container">
-    <div :class="['toast', 'text-black', 'bg-info']" data-autohide="false" id="lab-toast">
+    <div :class="['toast', 'text-black', toastType === 0 ? 'bg-info' : 'bg-danger']" data-autohide="false" id="lab-toast">
       <div class="d-flex">
         <div class="toast-body">
           {{ toastMessage }}
@@ -499,7 +508,6 @@ import * as vNG from "v-network-graph";
 import {VNetworkGraph} from "v-network-graph";
 
 // worker
-import {Convert} from "@/support/convertHelper";
 import {LabState} from "@/models/lab-states";
 
 // get pinia stores
@@ -564,16 +572,26 @@ const { katharaLab, currentState: labState } = storeToRefs(useLabStore());
 
 watch(labState, async (value, oldValue) => {
   if (value !== oldValue) {
-    if (oldValue === LabState.EDITING && value === LabState.SUBMITTED) {
-      toastMessage.value = "Successfully submitted lab...";
-      toast.show();
+    if (oldValue === LabState.EDITING && value === LabState.CREATED) {
+      toastMessage.value = "Successfully created lab...";
+      showToast();
+    }
+    if (oldValue === LabState.CREATED && value === LabState.STARTING) {
+      toastMessage.value = "Lab starting...";
+      showToast();
+    }
+
+    if (oldValue === LabState.STARTING && value === LabState.RUNNING) {
+      toastMessage.value = "Lab running...";
+      showToast();
     }
   }
 })
 
 // toast variables
 const toastMessage = ref("");
-const toast = new Toast(document.getElementById("lab-toast")!);
+const toastType = ref(0);
+
 
 const eventHandlers: vNG.EventHandlers = {
   "node:dragend": (draggedNode) => {
@@ -948,17 +966,24 @@ const onDeviceTypeChange = () => {
   }
 };
 
+const showToast = () => {
+  const toast = new Toast(document.getElementById("lab-toast")!);
+  toast.show();
+}
+
 const showGraphJson = () => {
   console.log(nodes.value);
   console.log(edges.value);
 };
 
 const createLab = async () => {
-  console.log("Updating lab...");
   labStore.convertGraphToTopo(nodes.value);
-  console.log(katharaLab.value);
   // myWorker.send("Hello worker!").then((reply: any) => console.log(reply));
   await labStore.createLab();
+}
+
+const startLab = async () => {
+  await labStore.startLab();
 }
 
 </script>
