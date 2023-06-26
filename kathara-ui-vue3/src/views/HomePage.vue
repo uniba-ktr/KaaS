@@ -70,7 +70,7 @@
         @click="createLab"
         :disabled="labState !== LabState.EDITING"
     >
-      Create Kathara Lab
+      Create Lab
     </button>
 
     <button
@@ -79,7 +79,15 @@
         @click="runLab"
         :disabled="labState !== LabState.CREATED"
     >
-      Run Kathara Lab
+      Run Lab
+    </button>
+    <button
+        type="button"
+        class="btn btn-danger mb-1 me-1 btn-lg"
+        @click="stopLab"
+        :disabled="labState !== LabState.RUNNING"
+    >
+      Stop Lab
     </button>
   </p>
   <v-network-graph
@@ -510,7 +518,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, watch, defineAsyncComponent} from "vue";
+import {defineAsyncComponent, reactive, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useGraphStore} from "@/stores/app-graph";
 import {useLabStore} from "@/stores/app-lab";
@@ -581,7 +589,7 @@ const configs = reactive(
 );
 
 // lab variables
-const { currentState: labState } = storeToRefs(labStore);
+const { currentState: labState, visibleConsoleFrames } = storeToRefs(labStore);
 
 watch(labState, async (value, oldValue) => {
   if (value !== oldValue) {
@@ -597,6 +605,17 @@ watch(labState, async (value, oldValue) => {
     if (oldValue === LabState.STARTING && value === LabState.RUNNING) {
       toastMessage.value = "Lab is running...";
       showToast();
+    }
+
+    if (oldValue === LabState.RUNNING && value === LabState.CLEANING) {
+      toastMessage.value = "Lab is being cleaned...";
+      showToast();
+    }
+
+    if (oldValue === LabState.CLEANING && value === LabState.REMOVED) {
+      toastMessage.value = "Lab is successfully wiped...";
+      showToast();
+      await labStore.resetLabState();
     }
   }
 })
@@ -1024,6 +1043,18 @@ const createLab = async () => {
 
 const runLab = async () => {
   await labStore.runLab();
+}
+
+const stopLab = async () => {
+  console.log("Trying to stop running lab...");
+  console.log("1. close all remaining visible iframes....");
+  for (let machineName of visibleConsoleFrames.value) {
+    const frameIdx = consoleIframeComponents.value.findIndex(c => c.machine_name === machineName);
+    consoleIframeComponents.value.splice(frameIdx, 1);
+  }
+  labStore.removeAllMachineConsoleIframe();
+  console.log("2. Clean & wipe current lab...");
+  await labStore.stopLab();
 }
 
 </script>

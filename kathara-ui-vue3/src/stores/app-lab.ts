@@ -4,7 +4,7 @@ import {LabState} from "@/models/lab-states";
 import type {CollisionDomain, DeviceInterface, NetworkDevice} from "@/models/graph-models";
 import {kathara_api} from "@/support/httpCommon";
 import {Convert} from "@/support/convertHelper";
-import type { Info, ApiResponse} from "@/models/api-models";
+import type {ApiResponse, Info} from "@/models/api-models";
 
 import {poll} from "poll";
 
@@ -124,7 +124,7 @@ export const useLabStore = defineStore("lab", {
         async runLab() {
             const resp = await kathara_api
                 .post(`/lstart`, {
-                    lab_name: this.getLabName
+                    lab_name: this.katharaLab.name
                 })
                 .then((resp) => resp.data)
 
@@ -142,8 +142,8 @@ export const useLabStore = defineStore("lab", {
                 await poll(async () => {
                     const resp = await kathara_api
                         .post(`/linfo`, {
-                            lab_name: this.getLabName,
-                            lab_hash: this.getLabHash,
+                            lab_name: this.katharaLab.name,
+                            lab_hash: this.labHash,
                         })
                         .then((resp) => {
                             const apiResponse: ApiResponse = Convert.toApiResponse(JSON.stringify(resp.data));
@@ -166,6 +166,54 @@ export const useLabStore = defineStore("lab", {
                 }, 5000, shouldStopPolling)
             }, 1000)
         },
+        async stopLab() {
+            const cleanResp = await kathara_api
+                .post(`/lclean`, {
+                    lab_name: this.katharaLab.name,
+                    lab_hash: this.labHash,
+                })
+                .then((resp) => resp.data)
+
+            const cleanApiResponse = Convert.toApiResponse(JSON.stringify(cleanResp));
+
+            if (cleanApiResponse.success) {
+                this.currentState = LabState.CLEANING;
+            }
+
+            // begin to polling for lab wipe
+            let stopPolling = false;
+            const shouldStopPolling = () => stopPolling
+
+            setTimeout(async () => {
+                await poll(async () => {
+                    const resp = await kathara_api
+                        .post(`/wipe`, {
+                            lab_name: this.katharaLab.name,
+                            lab_hash: this.labHash,
+                        })
+                        .then((resp) => {
+                            const apiResponse: ApiResponse = Convert.toApiResponse(JSON.stringify(resp.data));
+                            if (apiResponse.success) {
+                                stopPolling = true;
+                            }
+
+                            return apiResponse;
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return err;
+                        })
+
+                    if (resp.success) {
+                        this.currentState = LabState.REMOVED;
+                        // remove lab_hash & labMachines
+                        this.labHash = "";
+                        this.labMachines = {};
+                    }
+
+                }, 5000, shouldStopPolling)
+            }, 1000);
+        },
         checkConsoleIframeVisibility(machineName: string): boolean {
             return this.visibleConsoleFrames.indexOf(machineName) >= 0;
         },
@@ -179,6 +227,9 @@ export const useLabStore = defineStore("lab", {
                 this.visibleConsoleFrames.splice(idx , 1);
             }
         },
+        removeAllMachineConsoleIframe() {
+            this.visibleConsoleFrames = [];
+        },
         getMachineInfo(machineName: string): Info | undefined {
             let keys = Object.keys(this.labMachines);
 
@@ -188,6 +239,11 @@ export const useLabStore = defineStore("lab", {
                 }
             }
             return undefined;
+        },
+        async resetLabState() {
+            setTimeout(() => {
+                this.currentState = LabState.EDITING;
+            }, 1000);
         }
     },
     getters: {
