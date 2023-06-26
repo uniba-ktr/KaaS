@@ -494,7 +494,10 @@
     </div>
   </div>
   <!-- END #labToast -->
-  <!-- BEGIN #draggableConsole -->
+  <!--
+    BEGIN #draggableConsole
+    Note: must use key & id = machine_name so components can be correctly removed
+  -->
   <component
     v-for="(item, idx) of consoleIframeComponents"
     :key="item.machine_name"
@@ -512,7 +515,6 @@ import {storeToRefs} from "pinia";
 import {useGraphStore} from "@/stores/app-graph";
 import {useLabStore} from "@/stores/app-lab";
 import {Toast} from "bootstrap";
-import LabMachineConsole from "@/components/custom/LabMachineConsole.vue";
 import type {CollisionDomain, DeviceInterface, NetworkDevice,} from "@/models/graph-models";
 
 import * as vNG from "v-network-graph";
@@ -704,12 +706,12 @@ const eventHandlers: vNG.EventHandlers = {
 // v-network-graph system
 const selectedNodes = ref<string[]>([]);
 const selectedEdges = ref<string[]>([]);
-const nextCDIndex = ref(
+/*const nextCDIndex = ref(
   Object.keys(nodes).filter((n) => n.indexOf("cd") >= 0).length + 1
 );
 const nextNDIndex = ref(
   Object.keys(nodes).filter((n) => n.indexOf("nd") >= 0).length + 1
-);
+);*/
 const nextEdgeIndex = ref(Object.keys(edges).length + 1);
 const selectedDeviceType = ref("");
 
