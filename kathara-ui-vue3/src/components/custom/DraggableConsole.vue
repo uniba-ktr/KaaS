@@ -23,7 +23,17 @@ const closeConsoleFrame = () => {
     class="bg-dark border-theme bg-opacity-75 mb-3 console-container"
     v-drag
   >
-    <card-header class="border-theme fw-bold small text-inverse">WebTTy of {{ machineInfo.name }}</card-header>
+    <card-header class="border-theme d-flex fw-bold small text-inverse justify-content-between">
+      WebTTy of {{ machineInfo.name }}
+      <button
+          type="button"
+          class="close btn btn-outline-warning btn-sm me-1"
+          aria-label="Close"
+          @click="closeConsoleFrame"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </card-header>
     <card-body>
       <iframe
         width="100%"
@@ -32,13 +42,6 @@ const closeConsoleFrame = () => {
         :src="`${webTTyBaseURL}/e/${machineInfo.container_id}`"
       >
       </iframe>
-      <button
-        type="button"
-        class="btn btn-outline-warning"
-        @click="closeConsoleFrame"
-      >
-        Close
-      </button>
     </card-body>
   </card>
 </template>
