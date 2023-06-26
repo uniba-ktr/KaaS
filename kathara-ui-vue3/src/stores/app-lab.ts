@@ -13,7 +13,7 @@ export type RootState = {
     currentState: LabState;
     labHash: string;
     labMachines: {[k: string]: Info},
-    showConsoleIframes: string[],
+    visibleConsoleFrames: string[],
 };
 
 export const useLabStore = defineStore("lab", {
@@ -30,7 +30,7 @@ export const useLabStore = defineStore("lab", {
           currentState: LabState.EDITING,
           labHash: "",
           labMachines: {},
-          showConsoleIframes: [],
+          visibleConsoleFrames: [],
       } as RootState),
     actions: {
         convertGraphToTopo(graphNodes: Record<string, CollisionDomain | NetworkDevice>) {
@@ -167,10 +167,17 @@ export const useLabStore = defineStore("lab", {
             }, 1000)
         },
         checkConsoleIframeVisibility(machineName: string): boolean {
-            return this.showConsoleIframes.indexOf(machineName) > 0;
+            return this.visibleConsoleFrames.indexOf(machineName) >= 0;
         },
         showMachineConsoleIframe(machineName: string) {
-            this.showConsoleIframes.push(machineName);
+            this.visibleConsoleFrames.push(machineName);
+        },
+        hideMachineConsoleIframe(machineName: string) {
+            const idx = this.visibleConsoleFrames.indexOf(machineName);
+
+            if (idx >= 0) {
+                this.visibleConsoleFrames.splice(idx , 1);
+            }
         },
         getMachineInfo(machineName: string): Info | undefined {
             let keys = Object.keys(this.labMachines);
@@ -193,7 +200,7 @@ export const useLabStore = defineStore("lab", {
         getLabState: (state) => state.currentState,
         getLabHash: (state) => state.labHash,
         getLabMachines: (state) => state.labMachines,
-        getShowConsoleIframes: (state) => state.showConsoleIframes,
+        getVisibleConsoleIframes: (state) => state.visibleConsoleFrames,
     },
     persist: true,
 });

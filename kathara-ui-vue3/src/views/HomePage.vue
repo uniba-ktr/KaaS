@@ -497,9 +497,11 @@
   <!-- BEGIN #draggableConsole -->
   <component
     v-for="(item, idx) of consoleIframeComponents"
-    :key="idx"
+    :key="item.machine_name"
+    :id="item.machine_name"
     :is="mapTypeComponents[item.component_name]"
     :machine_name="item.machine_name"
+    @closeConsoleFrame="closeTTy"
   />
   <!-- END #draggableConsole -->
 </template>
@@ -997,6 +999,14 @@ const onDeviceTypeChange = () => {
 const showToast = () => {
   const toast = new Toast(document.getElementById("lab-toast")!);
   toast.show();
+}
+
+const closeTTy = (machineName: string) => {
+  console.log("Trying to close tty of machine=" + machineName)
+  labStore.hideMachineConsoleIframe(machineName);
+  const frameIdx = consoleIframeComponents.value.findIndex(c => c.machine_name === machineName);
+  console.log("Found index=" + frameIdx);
+  consoleIframeComponents.value.splice(frameIdx, 1);
 }
 
 const showGraphJson = () => {
