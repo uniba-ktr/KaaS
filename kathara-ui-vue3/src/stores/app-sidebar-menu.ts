@@ -13,6 +13,18 @@ export const useAppSidebarMenuStore = defineStore({
         icon: "bi bi-house-door",
         text: "Home",
       },
+      {
+        url: "/labs",
+        text: "Kathara Labs",
+        icon: "far fa-folder-open",
+        children: [
+            {
+              url: '/labs/detail',
+              action: 'Detail',
+              text: 'Current Lab'
+            }
+        ]
+      }
     ];
   },
 });

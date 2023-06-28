@@ -6,29 +6,19 @@ const appOption = useAppOptionStore();
 const app_title = import.meta.env.VITE_APP_TITLE;
 const notificationData = [
   {
-    icon: "bi bi-bag text-theme",
-    title: "NEW ORDER RECEIVED ($1,299)",
+    icon: "far fa-folder-open text-theme",
+    title: "New kathara lab has been created",
     time: "JUST NOW",
   },
   {
-    icon: "bi bi-person-circle text-theme",
-    title: "3 NEW ACCOUNT CREATED",
+    icon: "fas fa-laptop text-theme",
+    title: "New firewall add to 'SDN bgp test' lab",
     time: "2 MINUTES AGO",
   },
   {
     icon: "bi bi-gear text-theme",
-    title: "SETUP COMPLETED",
+    title: "'SDN bgp test' lab successfully deployed",
     time: "3 MINUTES AGO",
-  },
-  {
-    icon: "bi bi-grid text-theme",
-    title: "WIDGET INSTALLATION DONE",
-    time: "5 MINUTES AGO",
-  },
-  {
-    icon: "bi bi-credit-card text-theme",
-    title: "PAYMENT METHOD ENABLED",
-    time: "10 MINUTES AGO",
   },
 ];
 
@@ -97,6 +87,39 @@ function checkForm(event) {
     <!-- BEGIN menu -->
     <div class="menu">
       <div class="menu-item dropdown dropdown-mobile-full">
+        <a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
+          <div class="menu-icon"><i class="bi bi-bell nav-icon"></i></div>
+          <div class="menu-badge bg-theme" v-if="notificationData && notificationData.length > 0"></div>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end mt-1 w-300px fs-11px pt-1">
+          <h6 class="dropdown-header fs-10px mb-1">NOTIFICATIONS</h6>
+          <div class="dropdown-divider mt-1"></div>
+          <template v-if="notificationData && notificationData.length > 0">
+            <a href="#" class="d-flex align-items-center py-10px dropdown-item text-wrap" v-for="(notification, index) in notificationData" v-bind:key="index">
+              <div class="fs-20px">
+                <i v-if="notification.icon" v-bind:class="notification.icon"></i>
+              </div>
+              <div class="flex-1 flex-wrap ps-3">
+                <div class="mb-1 text-white">{{ notification.title }}</div>
+                <div class="small">{{ notification.time }}</div>
+              </div>
+              <div class="ps-2 fs-16px">
+                <i class="bi bi-chevron-right"></i>
+              </div>
+            </a>
+          </template>
+          <template v-else>
+            <div class="dropdown-notification-item">
+              No record found
+            </div>
+          </template>
+          <hr class="bg-white-transparent-5 mb-0 mt-2" />
+          <div class="py-10px mb-n2 text-center">
+            <a href="#" class="text-decoration-none fw-bold">SEE ALL</a>
+          </div>
+        </div>
+      </div>
+      <div class="menu-item dropdown dropdown-mobile-full">
         <a
           href="#"
           data-bs-toggle="dropdown"
@@ -106,7 +129,7 @@ function checkForm(event) {
           <div class="menu-img online">
             <img src="/assets/img/user/profile.jpg" alt="Profile" height="60" />
           </div>
-          <div class="menu-text d-sm-block d-none">username@account.com</div>
+          <div class="menu-text d-sm-block d-none">admin@uni-bamberg.de</div>
         </a>
         <div class="dropdown-menu dropdown-menu-end me-lg-3 fs-11px mt-1">
           <RouterLink
@@ -118,14 +141,8 @@ function checkForm(event) {
           <RouterLink
             to="/email/inbox"
             class="dropdown-item d-flex align-items-center"
-            >INBOX
-            <i class="bi bi-envelope ms-auto text-theme fs-16px my-n1"></i
-          ></RouterLink>
-          <RouterLink
-            to="/calendar"
-            class="dropdown-item d-flex align-items-center"
-            >CALENDAR
-            <i class="bi bi-calendar ms-auto text-theme fs-16px my-n1"></i
+            >MY LABS
+            <i class="far fa-folder-open ms-auto text-theme fs-16px my-n1"></i
           ></RouterLink>
           <RouterLink
             to="/settings"

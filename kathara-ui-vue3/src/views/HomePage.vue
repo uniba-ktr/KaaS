@@ -1,10 +1,10 @@
 <template>
   <ul class="breadcrumb">
-    <li class="breadcrumb-item"><a href="#">BREADCRUMB</a></li>
-    <li class="breadcrumb-item active">HOME PAGE</li>
+    <li class="breadcrumb-item"><a href="#">KaaS</a></li>
+    <li class="breadcrumb-item active">Current Lab</li>
   </ul>
   <h1 class="page-header">
-    KaaS <small>build your topology here</small>
+    KaaS <small>A simple network topology</small>
   </h1>
   <p>
     <button
@@ -1046,14 +1046,11 @@ const runLab = async () => {
 }
 
 const stopLab = async () => {
-  console.log("Trying to stop running lab...");
-  console.log("1. close all remaining visible iframes....");
   for (let machineName of visibleConsoleFrames.value) {
     const frameIdx = consoleIframeComponents.value.findIndex(c => c.machine_name === machineName);
     consoleIframeComponents.value.splice(frameIdx, 1);
   }
   labStore.removeAllMachineConsoleIframe();
-  console.log("2. Clean & wipe current lab...");
   await labStore.stopLab();
 }
 
