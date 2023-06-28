@@ -537,7 +537,7 @@ const graphStore = useGraphStore();
 const labStore = useLabStore();
 
 // v-network-graph variables
-const { nodes, edges, layout } = storeToRefs(graphStore);
+const { nodes, edges, usedCdCodes, nextEdgeIndex, layout } = storeToRefs(graphStore);
 
 const configs = reactive(
   vNG.defineConfigs({
@@ -731,12 +731,10 @@ const selectedEdges = ref<string[]>([]);
 const nextNDIndex = ref(
   Object.keys(nodes).filter((n) => n.indexOf("nd") >= 0).length + 1
 );*/
-const nextEdgeIndex = ref(Object.keys(edges).length + 1);
 const selectedDeviceType = ref("");
 
 // used CD codes
 const newCdCode = ref("");
-const usedCdCodes = ref<string[]>(["A", "B"]);
 
 // new network device properties
 const nodeMode = ref(true); // true => add new cd/device, false => edit dbl cd/device
@@ -757,7 +755,7 @@ const deviceShell = ref("");
 // node functions
 const isCollisionDomainName = (e: KeyboardEvent) => {
   const char = e.key;
-  if (/^[A-Za-z]+$/.test(char)) return true;
+  if (/^[A-Z]*$/.test(char)) return true;
   else e.preventDefault();
 };
 
@@ -856,6 +854,11 @@ const addEditNetworkDevice = () => {
     };
     const nodeId = deviceName.value;
     nodes.value[nodeId] = newNetworkDevice;
+    // add to layout
+    layout.value.nodes[nodeId] = {
+      x: 100,
+      y: 100
+    }
   } else {
     nodes.value[editedNode.value].docker_image = deviceDockerImage.value;
     nodes.value[editedNode.value].startup_script =
@@ -876,7 +879,6 @@ const addEditNetworkDevice = () => {
       deviceEnv.value !== "" ? deviceEnv.value : undefined;
     nodes.value[editedNode.value].shell =
       deviceShell.value !== "" ? deviceShell.value : undefined;
-    console.log("Update the selected network device");
   }
   document.getElementById("closeModalNetworkDevice")!.click();
 };
@@ -888,10 +890,12 @@ const closeNetworkDeviceModal = () => {
   deviceCPUShare.value = 1;
   deviceBridgeEnabled.value = false;
   deviceIPv6Enabled.value = false;
+  deviceStartupScript.value = "";
+  deviceShutdownScript.value = "";
   deviceExecCmds.value = "";
-  //deviceSysctlOptions.value = "";
+  deviceSysctlOptions.value = "";
   deviceEnv.value = "";
-  //deviceShell.value = "";
+  deviceShell.value = "";
   nodeMode.value = true;
   editedNode.value = "";
 };
@@ -933,13 +937,13 @@ const addEditEdge = () => {
       nodes.value[targetName].interfaces.push(newDeviceInterface);
     }
     // add edge to graph
+    nextEdgeIndex.value++;
     const edgeId = `edge${nextEdgeIndex.value}`;
     edges.value[edgeId] = {
       source: sourceName,
       target: targetName,
       info: newDeviceInterface,
     };
-    nextEdgeIndex.value++;
   } else {
     // edit the current selected link
     console.log(`Edit the link ${edges.value[selectedEdges.value[0]]}`);

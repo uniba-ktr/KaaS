@@ -163,8 +163,8 @@ export const useLabStore = defineStore("lab", {
                         this.labMachines = resp.info;
                     }
 
-                }, 5000, shouldStopPolling)
-            }, 1000)
+                }, 15000, shouldStopPolling)
+            }, 15000)
         },
         async stopLab() {
             const cleanResp = await kathara_api
