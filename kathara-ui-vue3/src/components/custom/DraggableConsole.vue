@@ -12,7 +12,6 @@ const labStore = useLabStore();
 const machineInfo: Info = <Info>labStore.getMachineInfo(props.machine_name);
 
 const closeConsoleFrame = () => {
-  console.log("Inside draggableConsole machine=" + machineInfo.name)
   emit('closeConsoleFrame', machineInfo.name);
 }
 
