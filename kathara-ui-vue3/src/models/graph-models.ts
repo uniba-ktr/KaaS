@@ -1,4 +1,5 @@
-import type { Node, Edge } from "v-network-graph";
+import type {Node, Edge, Edges} from "v-network-graph";
+import type {Layouts} from "v-network-graph";
 
 export interface DeviceInterface {
   index: string;
@@ -35,4 +36,12 @@ export interface NetworkDevice extends Node {
 
 export interface GraphLink extends Edge {
   info: DeviceInterface;
+}
+
+export interface TopologyModel {
+  nodes: Record<string, CollisionDomain | NetworkDevice>;
+  edges: Record<string, GraphLink>;
+  usedCdCodes: string[];
+  nextEdgeIndex: number;
+  layout: Layouts;
 }

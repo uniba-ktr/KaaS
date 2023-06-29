@@ -34,8 +34,6 @@ export const useLabStore = defineStore("lab", {
       } as RootState),
     actions: {
         convertGraphToTopo(graphNodes: Record<string, CollisionDomain | NetworkDevice>) {
-            // clean old topo values
-            this.katharaLab.topo = []
             for (const k in graphNodes) {
                 const node = graphNodes[k];
                 switch (node.node_type) {
@@ -106,6 +104,13 @@ export const useLabStore = defineStore("lab", {
                 })
             }
             return deviceNetworks;
+        },
+        importLab(graphObject: any) {
+            this.katharaLab.name = graphObject.name;
+            this.katharaLab.description = graphObject.description;
+            this.katharaLab.version = graphObject.version;
+            this.katharaLab.author = graphObject.author;
+            this.katharaLab.email = graphObject.email;
         },
         async createLab() {
             const resp = await kathara_api
@@ -209,6 +214,7 @@ export const useLabStore = defineStore("lab", {
                         // remove lab_hash & labMachines
                         this.labHash = "";
                         this.labMachines = {};
+                        this.katharaLab.topo = [];
                     }
 
                 }, 5000, shouldStopPolling)

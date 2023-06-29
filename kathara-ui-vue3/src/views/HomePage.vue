@@ -4,92 +4,135 @@
     <li class="breadcrumb-item active">Current Lab</li>
   </ul>
   <h1 class="page-header">
-    KaaS <small>A simple network topology</small>
+    {{ labStore.getLabName }} <small>{{ labStore.getLabDescription }}</small>
   </h1>
-  <p>
-    <button
-      type="button"
-      class="btn btn-pink mb-1 me-1 btn-lg"
-      data-bs-toggle="modal"
-      data-bs-target="#modalCollisionDomain"
-      id="openCollisionDomainModal"
-      :disabled="labState !== LabState.EDITING"
-    >
-      Add Collision Domain
-    </button>
-    <button
-      type="button"
-      class="btn btn-info mb-1 me-1 btn-lg"
-      data-bs-toggle="modal"
-      data-bs-target="#modalNetworkDevice"
-      id="openNetworkDeviceModal"
-      :disabled="labState !== LabState.EDITING"
-    >
-      Add Network Device
-    </button>
-    <button
-        type="button"
-        class="btn btn-lg me-1 btn-success"
-        :disabled="!isEdgeEligible(selectedNodes)"
-        data-bs-toggle="modal"
-        data-bs-target="#modalEdge"
-        @click="openEdgeModal(true)"
-    >
-      Add link
-    </button>
-    <button
-        type="button"
-        class="btn btn-lg me-1 btn-success"
-        :disabled="labState !== LabState.EDITING || selectedEdges.length === 0"
-        data-bs-toggle="modal"
-        data-bs-target="#modalEdge"
-        @click="openEdgeModal(false)"
-    >
-      Edit link
-    </button>
-    <button
-        type="button"
-        class="btn btn-lg me-1 btn-danger"
-        :disabled="labState !== LabState.EDITING || selectedEdges.length === 0"
-        @click="removeEdge"
-    >
-      Remove link
-    </button>
-    <button
-        type="button"
-        class="btn btn-warning mb-1 me-1 btn-lg"
-        @click="showGraphJson"
-    >
-      Show graph in json
-    </button>
-  </p>
-  <p>
-    <button
-        type="button"
-        class="btn btn-success mb-1 me-1 btn-lg"
-        @click="createLab"
-        :disabled="labState !== LabState.EDITING"
-    >
-      Create Lab
-    </button>
-
-    <button
-        type="button"
-        class="btn btn-primary mb-1 me-1 btn-lg"
-        @click="runLab"
-        :disabled="labState !== LabState.CREATED"
-    >
-      Run Lab
-    </button>
-    <button
-        type="button"
-        class="btn btn-danger mb-1 me-1 btn-lg"
-        @click="stopLab"
-        :disabled="labState !== LabState.RUNNING"
-    >
-      Stop Lab
-    </button>
-  </p>
+  <div class="mb-sm-4 mb-3 d-sm-flex">
+    <div class="mt-sm-0 mt-2">
+      <a href="#" class="text-inverse text-opacity-75 text-decoration-none" @click="exportGraphJson">
+        <i class="fa fa-download fa-fw me-1 text-theme"></i> Export
+      </a>
+    </div>
+    <div class="ms-sm-4 mt-sm-0 mt-2">
+      <a href="#" class="text-inverse text-opacity-75 text-decoration-none"
+         data-bs-toggle="modal"
+         data-bs-target="#modalImportGraph">
+        <i class="fa fa-upload fa-fw me-1 text-theme"></i> Import
+      </a>
+    </div>
+    <div class="ms-sm-4 mt-sm-0 mt-2">
+      <a
+          href="#"
+          class="text-inverse text-opacity-75 text-decoration-none {{ labState !== LabState.EDITING ? 'disabled': '' }}"
+          @click="resetGraph"
+      >
+        <i class="fa fa-trash-alt fa-fw me-1 text-theme"></i> Reset
+      </a>
+    </div>
+  </div>
+  <div class="row gx-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center bg-inverse bg-opacity-10 fw-400">
+          Graph operations
+        </div>
+        <div class="card-body">
+          <button
+              type="button"
+              class="btn btn-pink me-1 btn-lg"
+              data-bs-toggle="modal"
+              data-bs-target="#modalCollisionDomain"
+              id="openCollisionDomainModal"
+              :disabled="labState !== LabState.EDITING"
+          >
+            Add Collision Domain
+          </button>
+          <button
+              type="button"
+              class="btn btn-info me-1 btn-lg"
+              data-bs-toggle="modal"
+              data-bs-target="#modalNetworkDevice"
+              id="openNetworkDeviceModal"
+              :disabled="labState !== LabState.EDITING"
+          >
+            Add Network Device
+          </button>
+          <button
+              type="button"
+              class="btn btn-lg me-1 btn-success"
+              :disabled="!isEdgeEligible(selectedNodes)"
+              data-bs-toggle="modal"
+              data-bs-target="#modalEdge"
+              @click="openEdgeModal(true)"
+          >
+            Add link
+          </button>
+          <button
+              type="button"
+              class="btn btn-lg me-1 btn-success"
+              :disabled="labState !== LabState.EDITING || selectedEdges.length === 0"
+              data-bs-toggle="modal"
+              data-bs-target="#modalEdge"
+              @click="openEdgeModal(false)"
+          >
+            Edit link
+          </button>
+          <button
+              type="button"
+              class="btn btn-lg me-1 btn-danger"
+              :disabled="labState !== LabState.EDITING || selectedEdges.length === 0"
+              @click="removeEdge"
+          >
+            Remove link
+          </button>
+        </div>
+        <div class="card-arrow">
+          <div class="card-arrow-top-left"></div>
+          <div class="card-arrow-top-right"></div>
+          <div class="card-arrow-bottom-left"></div>
+          <div class="card-arrow-bottom-right"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center bg-inverse bg-opacity-10 fw-400">
+          Lab operations
+        </div>
+        <div class="card-body">
+          <button
+              type="button"
+              class="btn btn-success me-1 btn-lg"
+              @click="createLab"
+              :disabled="labState !== LabState.EDITING"
+          >
+            Create Lab
+          </button>
+          <button
+              type="button"
+              class="btn btn-primary me-1 btn-lg"
+              @click="runLab"
+              :disabled="labState !== LabState.CREATED"
+          >
+            Run Lab
+          </button>
+          <button
+              type="button"
+              class="btn btn-danger me-1 btn-lg"
+              @click="stopLab"
+              :disabled="labState !== LabState.RUNNING"
+          >
+            Stop Lab
+          </button>
+        </div>
+        <div class="card-arrow">
+          <div class="card-arrow-top-left"></div>
+          <div class="card-arrow-top-right"></div>
+          <div class="card-arrow-bottom-left"></div>
+          <div class="card-arrow-bottom-right"></div>
+        </div>
+      </div>
+    </div>
+  </div>
   <v-network-graph
     class="graph"
     v-model:selected-nodes="selectedNodes"
@@ -489,7 +532,56 @@
       </div>
     </div>
   </div>
-  <!-- END #modalCollisionDomain -->
+  <!-- END #modalEdge -->
+  <!-- BEGIN #modalImportGraph -->
+  <div class="modal fade" id="modalImportGraph">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Import graph from JSON</h5>
+          <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">File:</label>
+            <div class="row row-space-10">
+              <div class="col-12">
+                <input
+                    class="form-control"
+                    type="file"
+                    ref="jsonFile"
+                    accept="application/JSON"
+                    @change="onFileChange"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+              type="button"
+              class="btn btn-outline-default"
+              data-bs-dismiss="modal"
+              id="closeModalImportGraph"
+          >
+            Close
+          </button>
+          <button
+              type="button"
+              class="btn btn-outline-theme"
+              @click="importGraphFromJSON"
+          >
+            Import
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- END #modalImportGraph -->
   <!-- BEGIN #labToast -->
   <div class="toasts-container">
     <div :class="['toast', 'text-black', toastType === 0 ? 'bg-info' : 'bg-danger']" data-autohide="false" id="lab-toast">
@@ -506,14 +598,16 @@
     BEGIN #draggableConsole
     Note: must use key & id = machine_name so components can be correctly removed
   -->
-  <component
-    v-for="(item, idx) of consoleIframeComponents"
-    :key="item.machine_name"
-    :id="item.machine_name"
-    :is="mapTypeComponents[item.component_name]"
-    :machine_name="item.machine_name"
-    @closeConsoleFrame="closeTTy"
-  />
+  <div class="console-view">
+    <component
+        v-for="(item, idx) of consoleIframeComponents"
+        :key="item.machine_name"
+        :id="item.machine_name"
+        :is="mapTypeComponents[item.component_name]"
+        :machine_name="item.machine_name"
+        @closeConsoleFrame="closeTTy"
+    />
+  </div>
   <!-- END #draggableConsole -->
 </template>
 
@@ -523,10 +617,16 @@ import {storeToRefs} from "pinia";
 import {useGraphStore} from "@/stores/app-graph";
 import {useLabStore} from "@/stores/app-lab";
 import {Toast} from "bootstrap";
-import type {CollisionDomain, DeviceInterface, NetworkDevice,} from "@/models/graph-models";
+import type {CollisionDomain, DeviceInterface, NetworkDevice, TopologyModel} from "@/models/graph-models";
 
 import * as vNG from "v-network-graph";
 import {VNetworkGraph} from "v-network-graph";
+
+// json
+import FileSaver, { saveAs } from "file-saver";
+import { HTMLInputEvent } from "@/models/extra-models";
+const jsonFile = ref<InstanceType<typeof HTMLInputElement>>();
+const jsonContent = ref("");
 
 // worker
 import {LabState} from "@/models/lab-states";
@@ -594,27 +694,22 @@ const { currentState: labState, visibleConsoleFrames } = storeToRefs(labStore);
 watch(labState, async (value, oldValue) => {
   if (value !== oldValue) {
     if (oldValue === LabState.EDITING && value === LabState.CREATED) {
-      toastMessage.value = "Successfully created lab...";
-      showToast();
+      showToast("Successfully created lab...", 0);
     }
     if (oldValue === LabState.CREATED && value === LabState.STARTING) {
-      toastMessage.value = "Lab is starting...";
-      showToast();
+      showToast("Lab is starting...", 0);
     }
 
     if (oldValue === LabState.STARTING && value === LabState.RUNNING) {
-      toastMessage.value = "Lab is running...";
-      showToast();
+      showToast("Lab is running...", 0);
     }
 
     if (oldValue === LabState.RUNNING && value === LabState.CLEANING) {
-      toastMessage.value = "Lab is being cleaned...";
-      showToast();
+      showToast("Lab is being cleaned...", 1);
     }
 
     if (oldValue === LabState.CLEANING && value === LabState.REMOVED) {
-      toastMessage.value = "Lab is successfully wiped...";
-      showToast();
+      showToast("Lab is successfully wiped...", 1);
       await labStore.resetLabState();
     }
   }
@@ -1021,7 +1116,9 @@ const onDeviceTypeChange = () => {
   }
 };
 
-const showToast = () => {
+const showToast = (message: string, type: number) => {
+  toastMessage.value = message;
+  toastType.value = type;
   const toast = new Toast(document.getElementById("lab-toast")!);
   toast.show();
 }
@@ -1034,10 +1131,69 @@ const closeTTy = (machineName: string) => {
   consoleIframeComponents.value.splice(frameIdx, 1);
 }
 
-const showGraphJson = () => {
-  console.log(nodes.value);
-  console.log(edges.value);
+const exportGraphJson = () => {
+  if (Object.keys(nodes.value).length > 0) {
+    const graphModel: TopologyModel = {
+      nodes: nodes.value,
+      edges: edges.value,
+      usedCdCodes: usedCdCodes.value,
+      nextEdgeIndex: nextEdgeIndex.value,
+      layout: layout.value,
+    };
+
+    const exportLab = {
+      name: labStore.getLabName,
+      description: labStore.getLabDescription,
+      version: labStore.getLabVersion,
+      email: labStore.getLabEmail,
+      author: labStore.getLabAuthor,
+      model: graphModel,
+    }
+
+    const graphJSONFile = new File([JSON.stringify(exportLab)],
+        labStore.getLabName + ".json",
+        {type: "text/plain;charset=utf-8"})
+    FileSaver.saveAs(graphJSONFile);
+    showToast("Export lab successfully.", 0);
+  } else {
+    showToast("Cannot export lab. Add a least one node to do so.", 1);
+  }
 };
+
+function onFileChange(event: HTMLInputEvent) {
+  let files = (event as HTMLInputEvent).target.files;
+  if (!files?.length) return
+  // show for debug
+  const fileReader = new FileReader();
+  fileReader.onload = (res) => {
+    jsonContent.value = <string>res.target?.result;
+  }
+  fileReader.onerror = (err) => {
+    console.log(err)
+  }
+  fileReader.readAsText(files[0]);
+}
+
+function importGraphFromJSON() {
+  const graphObj = JSON.parse(jsonContent.value);
+  // import lab information
+  labStore.importLab(graphObj);
+  // import graph information
+  graphStore.importGraph(graphObj);
+
+  // reset file input
+  jsonFile.value!.value = "";
+
+  // close modal
+  document.getElementById("closeModalImportGraph")!.click();
+
+  // show toast
+
+}
+
+const resetGraph = () => {
+  graphStore.resetGraph();
+}
 
 const createLab = async () => {
   labStore.convertGraphToTopo(nodes.value);
@@ -1074,5 +1230,14 @@ const stopLab = async () => {
 
 .icon-picture {
   pointer-events: none;
+}
+.disabled {
+  pointer-events: none;
+  cursor: default;
+}
+.console-view {
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 </style>

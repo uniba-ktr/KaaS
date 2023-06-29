@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import type {Layouts} from "v-network-graph";
-import type {CollisionDomain, GraphLink, NetworkDevice,} from "@/models/graph-models";
+import type {CollisionDomain, GraphLink, NetworkDevice, TopologyModel} from "@/models/graph-models";
 
 export type RootState = {
   nodes: Record<string, CollisionDomain | NetworkDevice>;
@@ -29,6 +29,20 @@ export const useGraphStore = defineStore("graph", {
       this.layout.nodes[nodeName].x = pos_X;
       this.layout.nodes[nodeName].y = pos_Y;
     },
+    resetGraph() {
+      this.nodes = {};
+      this.edges = {};
+      this.usedCdCodes = [];
+      this.nextEdgeIndex = 0;
+      this.layout = {nodes: {}}
+    },
+    importGraph(graphObject: any) {
+      this.nodes = graphObject.model.nodes;
+      this.edges = graphObject.model.edges;
+      this.layout = graphObject.model.layout;
+      this.usedCdCodes = graphObject.model.usedCdCodes;
+      this.nextEdgeIndex = graphObject.model.nextEdgeIndex;
+    }
   },
   getters: {
     getNodes: (state) => state.nodes,
