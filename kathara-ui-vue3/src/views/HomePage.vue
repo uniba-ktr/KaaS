@@ -105,7 +105,7 @@
               @click="createLab"
               :disabled="labState !== LabState.EDITING"
           >
-            Create Lab
+            Push Lab
           </button>
           <button
               type="button"
@@ -612,7 +612,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineAsyncComponent, reactive, ref, watch} from "vue";
+import {defineAsyncComponent, onMounted, reactive, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useGraphStore} from "@/stores/app-graph";
 import {useLabStore} from "@/stores/app-lab";
@@ -687,6 +687,12 @@ const configs = reactive(
     },
   })
 );
+
+// onMounted
+onMounted(() => {
+  console.log("REST link:" + import.meta.env.VITE_KATHARA_API_URL);
+  console.log("TTY link:" + import.meta.env.VITE_WEBTTY_API_URL);
+})
 
 // lab variables
 const { currentState: labState, visibleConsoleFrames } = storeToRefs(labStore);
