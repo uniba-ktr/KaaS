@@ -1202,12 +1202,14 @@ const resetGraph = () => {
 }
 
 const createLab = async () => {
+  console.log("CREATING laboratory")
   labStore.convertGraphToTopo(nodes.value);
   // myWorker.send("Hello worker!").then((reply: any) => console.log(reply));
   await labStore.createLab();
 }
 
 const runLab = async () => {
+  console.log("RUNNING lab");
   await labStore.runLab();
 }
 

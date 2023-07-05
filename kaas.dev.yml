@@ -38,4 +38,4 @@ services:
       context: ./kathara-ui-vue3
     # volumes only work if npm install was executed locally in the folder kathara-ui
     volumes:
-      - ./kathara-ui:/vue3
+      - ./kathara-ui-vue3:/vue3

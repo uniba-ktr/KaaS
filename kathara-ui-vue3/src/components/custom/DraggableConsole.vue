@@ -38,7 +38,7 @@ const closeConsoleFrame = () => {
         width="100%"
         height="85%"
         :title="machineInfo.container_name"
-        :src="`${webTTyBaseURL}/e/${machineInfo.container_id}`"
+        :src="`/e/${machineInfo.container_id}`"
       >
       </iframe>
     </card-body>

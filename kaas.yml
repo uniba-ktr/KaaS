@@ -65,3 +65,29 @@ services:
       - 8080:8080
     networks:
       - rest
+
+  kathara-traefik:
+    image: traefik
+    command:
+      - "--log.level=DEBUG"
+    environment:
+      - TZ=${TIME_ZONE:-Europe/Berlin}
+    volumes:
+      - docker-certs-client:/certs/client:ro
+    ports:
+      - 80:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.https-redirect.entrypoints=web"
+      - "traefik.http.routers.https-redirect.rule=HostRegexp(`{any:.*}`)"
+      - "traefik.http.routers.https-redirect.middlewares=https-redirect"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.traefik-https.entrypoints=websecure"
+      - "traefik.http.routers.traefik-https.tls=true"
+      - "traefik.http.routers.traefik-https.tls.certresolver=ktr-letsencrypt"
+      - "traefik.http.routers.traefik-https.rule=Host(`traefik.ktr.uni-bamberg.de`, `traefik.ktr.wiai.uni-bamberg.de`)"
+      - "traefik.http.routers.traefik-https.service=api@internal"
+      - "traefik.http.routers.traefik-https.middlewares=ktr-whitelist@file,ktr-rw@file,ktr-auth@file"
+      - "com.centurylinklabs.watchtower.enable=true"
+
+
