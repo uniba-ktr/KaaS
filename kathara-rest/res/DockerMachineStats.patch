@@ -1,0 +1,35 @@
+--- DockerMachineStatsOrg.py	2023-05-24 18:05:00.041419426 +0200
++++ DockerMachineStats.py	2023-05-17 12:41:39.334279890 +0200
+@@ -14,6 +14,7 @@
+         stats (Generator[Dict[str, Any], None, None]): A generator containing dicts with the Docker statistics
+         lab_hash (str): The hash identifier of the network scenario of the Docker Container.
+         name (str): The name of the device.
++        container_id (str): The Docker Container Id.
+         container_name (str): The Docker Container Name.
+         user (str): The user that deployed the associated Docker Network.
+         image (str): The Docker Image used for deploying the Docker Container.
+@@ -24,7 +25,7 @@
+         mem_percent (str): The memory usage of the Docker Container as a percentage.
+         net_usage (str): The network usage of the Docker Container.
+     """
+-    __slots__ = ['machine_api_object', 'stats', 'lab_hash', 'name', 'container_name', 'user', 'status', 'image',
++    __slots__ = ['machine_api_object', 'stats', 'lab_hash', 'name','container_id', 'container_name', 'user', 'status', 'image',
+                  'pids', 'cpu_usage', 'mem_usage', 'mem_percent', 'net_usage']
+ 
+     def __init__(self, machine_api_object: Container):
+@@ -34,6 +35,7 @@
+         self.lab_hash: str = machine_api_object.labels['lab_hash']
+         self.name: str = machine_api_object.labels['name']
+         self.container_name: str = machine_api_object.name
++        self.container_id: str = machine_api_object.id
+         self.user: Optional[str] = machine_api_object.labels['user']
+         self.image: str = machine_api_object.image.tags[0]
+         # Dynamic Information
+@@ -82,6 +84,7 @@
+         return {
+             "network_scenario_id": self.lab_hash,
+             "name": self.name,
++            "container_id": self.container_id,
+             "container_name": self.container_name,
+             "user": self.user,
+             "status": self.status,
