@@ -1,0 +1,31 @@
+[api]
+dashboard = true
+
+[metrics]
+[metrics.prometheus]
+buckets = [0.1,0.3,1.2,5.0]
+
+[entryPoints]
+[entryPoints.web]
+address = ":80"
+
+# TODO: SSL on later versions
+#[entryPoints.websecure]
+#address = ":443"
+
+#[certificatesresolvers.ktr-letsencrypt.acme]
+#email = "ktr.wiai@gmail.com"
+#storage = "/letsencrypt/acme.json"
+#[certificatesresolvers.ktr-letsencrypt.acme.httpchallenge]
+#entryPoint = "web"
+
+
+[providers]
+# Enable the file provider to define routers / middlewares / services in file
+[providers.file]
+directory = "/etc/traefik/services/"
+watch = true
+[providers.docker]
+exposedbyDefault = false
+defaultRule = "Host(`kaas.ktr`)"
+network = "rest"
