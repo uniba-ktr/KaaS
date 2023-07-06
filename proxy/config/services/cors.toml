@@ -1,0 +1,6 @@
+[http.middlewares]
+[http.middlewares.cors.headers]
+accessControlAllowMethods = [ "POST", "PUT" ]
+accessControlAllowOriginList = [ "*" ]
+accessControlMaxAge = 3600
+addVaryHeader = true

@@ -3,7 +3,7 @@ import axios from "axios";
 // const AUTH_API_VERSION_PREFIX = "/api/v1";
 
 const kathara_api = axios.create({
-  baseURL: 'http://localhost:8080/rest',
+  baseURL: "http://rest.kaas.ktr",
   // timeout: 5000, // Set a default timeout of 5 seconds
   headers: {
     Accept: "application/json",

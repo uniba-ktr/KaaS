@@ -29,6 +29,7 @@ services:
     image: ghcr.io/uniba-ktr/kaas-kathara-rest:latest
     depends_on:
       - daemon
+      - traefik
     environment:
       - DOCKER_TLS_VERIFY=1
       - DOCKER_TLS_CERTDIR=/certs
@@ -44,15 +45,17 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kaas-rest.rule=Host(`rest.kaas.ktr`)"
+      - "traefik.http.routers.kaas-rest.middlewares=transparent@file"
       - "traefik.http.services.kaas-rest.loadbalancer.server.port=8000"
 
   web-tty:
     image: ghcr.io/uniba-ktr/kaas-web-tty:latest
     depends_on:
       - daemon
+      - traefik
     restart: on-failure
-    ports:
-      - 8001:8080
+    #ports:
+    #  - 8001:8080
     networks:
       - kind
       - rest
@@ -72,13 +75,16 @@ services:
 
   kathara-ui:
     image: ghcr.io/uniba-ktr/kaas-kathara-ui-vue3:latest
-    ports:
-      - 8080:8080
+    depends_on:
+      - traefik
+    #ports:
+    #  - 8080:8080
     networks:
       - rest
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kaas-ui.rule=Host(`kaas.ktr`)"
+      - "traefik.http.routers.kaas-ui.middlewares=transparent@file"
       - "traefik.http.services.kaas-ui.loadbalancer.server.port=8080"
 
 

@@ -13,6 +13,11 @@ services:
       file: kaas.yml
       service: daemon
 
+  traefik:
+    extends:
+      file: kaas.yml
+      service: traefik
+
   web-tty:
     extends:
       file: kaas.yml
