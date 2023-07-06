@@ -25,6 +25,8 @@ ENV PYTHONPATH="/kathara-rest/"
 
 WORKDIR /kathara-rest/src
 
+ENV LAB_DIR="/labs"
+VOLUME /labs
 # For debug purposes symlink kathara
 ADD kathara /usr/bin/
 ADD kathara.conf /root/.config/kathara.conf
