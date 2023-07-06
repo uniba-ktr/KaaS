@@ -7,9 +7,11 @@ volumes:
   docker-certs-client:
   docker-socket:
 
+# iptable upgrades, run the following on your host:
+# -> sudo modprobe ip6table_filter
 services:
   daemon:
-    image: docker:dind
+    image: docker:23-dind
     privileged: true
     restart: on-failure:5
     environment:

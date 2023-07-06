@@ -20,7 +20,7 @@ export default defineConfig({
     proxy: {
       '^/rest|/openapi.json': {
         target: "http://kathara-rest:8000",
-        changeOrigin: true,
+        changeOrigin: false,
         secure: false,
         ws: true,
         rewrite: path => path.replace(/^\/rest/, ''),

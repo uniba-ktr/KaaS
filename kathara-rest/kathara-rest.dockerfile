@@ -1,4 +1,4 @@
-FROM docker:19
+FROM docker:24
 
 COPY requirements.txt /requirements.txt
 

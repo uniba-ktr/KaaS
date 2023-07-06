@@ -21,7 +21,8 @@ class LabWrapper(Lab):
 
     def __init__(self, lab_name: str, lab_state: LabStatus = LabStatus.submitted):
         self.state = lab_state
-        super().__init__(name=lab_name, path=os.path.abspath(lab_name))
+        self.path = os.path.abspath(lab_name)
+        super().__init__(name=lab_name)
 
     def __parse_lab__(self):
         if self.state is LabStatus.created or LabStatus.starting or LabStatus.running or LabStatus.cleaning:
