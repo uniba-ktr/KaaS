@@ -7,7 +7,7 @@ const kathara_api = axios.create({
   // timeout: 5000, // Set a default timeout of 5 seconds
   headers: {
     Accept: "application/json",
-    "Content-type": "application/json; charset=utf-8",
+    'Content-Type': 'application/json',
   },
 });
 
