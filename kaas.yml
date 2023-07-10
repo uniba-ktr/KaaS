@@ -44,7 +44,7 @@ services:
       - 8000:8000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kaas-rest.rule=Host(`rest.kaas.ktr`)"
+      - "traefik.http.routers.kaas-rest.rule=Host(`rest.kaas.test`)"
       - "traefik.http.routers.kaas-rest.middlewares=transparent@file"
       - "traefik.http.services.kaas-rest.loadbalancer.server.port=8000"
 
@@ -69,7 +69,7 @@ services:
       - docker-certs-client:/certs/client:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kaas-tty.rule=Host(`tty.kaas.ktr`)"
+      - "traefik.http.routers.kaas-tty.rule=Host(`tty.kaas.test`)"
       - "traefik.http.services.kaas-tty.loadbalancer.server.port=8080"
 
 
@@ -83,13 +83,13 @@ services:
       - rest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kaas-ui.rule=Host(`kaas.ktr`)"
+      - "traefik.http.routers.kaas-ui.rule=Host(`kaas.test`)"
       - "traefik.http.routers.kaas-ui.middlewares=transparent@file"
       - "traefik.http.services.kaas-ui.loadbalancer.server.port=8080"
 
 
   # TODO: For using traefik add the following line to /etc/hosts:
-  # 127.0.0.1 kaas.ktr rest.kaas.ktr tty.kaas.ktr traefik.kaas.ktr
+  # 127.0.0.1 kaas.test rest.kaas.test tty.kaas.test traefik.kaas.test
   traefik:
     container_name: "traefik"
     image: traefik:v2.5
@@ -121,6 +121,8 @@ services:
     labels:
       # TODO: SSL termination for deployments!
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik-http.rule=Host(`traefik.kaas.ktr`)"
+      - "traefik.http.routers.traefik-http.rule=Host(`traefik.kaas.test`)"
       - "traefik.http.routers.traefik-http.service=api@internal"
 
+# Reserved TLD names for testing RFC 2606
+# dnsmasq configuration for *.test domain

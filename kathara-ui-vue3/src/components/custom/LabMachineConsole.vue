@@ -30,7 +30,7 @@ import {storeToRefs} from "pinia";
 import {useLabStore} from "@/stores/app-lab";
 import { Info } from "@/models/api-models"
 const { labMachines: machines } = storeToRefs(useLabStore());
-const webTTyBaseURL = "http://localhost:8080/tty";
+const webTTyBaseURL = "http://tty.kaas.test";
 
 watch(machines, async (value, oldValue) => {
   if (Object.keys(oldValue).length === 0 && (Object.keys(value).length > 0)) {
