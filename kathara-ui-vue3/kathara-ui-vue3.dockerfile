@@ -9,6 +9,8 @@ RUN npm install
 
 COPY . /vue3/
 
-ENTRYPOINT ["npm", "run", "dev", "--", "--host"]
+RUN npm run build
+
+ENTRYPOINT ["npx", "vite", "--host", "0.0.0.0", "--port", "8080", "--mode", "staging"]
 
 EXPOSE 8080
