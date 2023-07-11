@@ -1,0 +1,4 @@
+[http.middlewares]
+[http.middlewares.transparent.headers]
+stsSeconds = 15552000
+hostsProxyHeaders = [ "X-Real-IP", "X-Forwarded-For", "X-Forwarded-Proto" ]

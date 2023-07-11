@@ -1,3 +1,4 @@
+import uvicorn
 import json
 from pathlib import Path
 from random import random
@@ -25,18 +26,18 @@ logging.config.fileConfig(LOGGING_CONFIG, disable_existing_loggers=False)
 
 # TODO: need to adjust origins to docker container names!
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
+    "*",
 ]
 
 app = FastAPI()
+
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 
@@ -213,3 +214,6 @@ async def create_lab(info: Laboratory):
     result = LabController().gen_lab(info)
 
     return result
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

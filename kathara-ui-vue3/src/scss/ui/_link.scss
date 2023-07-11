@@ -1,0 +1,7 @@
+a {
+	color: var(--bs-theme);
+	
+	&:hover {
+		color: rgba(#{var(--bs-theme-rgb)}, .75);
+	}
+}

@@ -6,7 +6,8 @@
   "additionalProperties": false,
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "minLength": 3
     },
     "description": {
       "type": "string"
@@ -96,7 +97,8 @@
           },
           "files": { "$ref": "file:../res/schemas/files.json"}
         }
-      }
+      },
+      "minContains": 1
     },
     "shared": {
       "type": "object",

@@ -1,0 +1,26 @@
+.table {
+	&.table-card {
+		& thead,
+		& tbody {
+			& > tr {
+				& td,
+				& th {
+					&:first-child {
+						@if $enable-rtl {
+							padding-right: $card-spacer-x;
+						} @else {
+							padding-left: $card-spacer-x;
+						}
+					}
+					&:last-child {
+						@if $enable-rtl {
+							padding-left: $card-spacer-x;
+						} @else {
+							padding-right: $card-spacer-x;
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,14 @@
+body {
+	& .ql-toolbar,
+	& .ql-container {
+		border-color: $border-color !important;
+	}
+}
+.border-0 .ql-toolbar {
+	border-top: none !important;
+	border-left: none !important;
+	border-right: none !important;
+}
+.border-0 .ql-container {
+	border: none !important;
+}

@@ -13,6 +13,11 @@ services:
       file: kaas.yml
       service: daemon
 
+  traefik:
+    extends:
+      file: kaas.yml
+      service: traefik
+
   web-tty:
     extends:
       file: kaas.yml
@@ -34,8 +39,8 @@ services:
       file: kaas.yml
       service: kathara-ui
     build:
-      dockerfile: kathara-ui.dockerfile
-      context: ./kathara-ui
+      dockerfile: kathara-ui-vue3.dockerfile
+      context: ./kathara-ui-vue3
     # volumes only work if npm install was executed locally in the folder kathara-ui
     volumes:
-      - ./kathara-ui:/me
+      - ./kathara-ui-vue3:/vue3

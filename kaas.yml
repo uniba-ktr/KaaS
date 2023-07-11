@@ -7,9 +7,11 @@ volumes:
   docker-certs-client:
   docker-socket:
 
+# iptable upgrades, run the following on your host:
+# -> sudo modprobe ip6table_filter
 services:
   daemon:
-    image: docker:dind
+    image: docker:23-dind
     privileged: true
     restart: on-failure:5
     environment:
@@ -27,6 +29,7 @@ services:
     image: ghcr.io/uniba-ktr/kaas-kathara-rest:latest
     depends_on:
       - daemon
+      - traefik
     environment:
       - DOCKER_TLS_VERIFY=1
       - DOCKER_TLS_CERTDIR=/certs
@@ -39,14 +42,20 @@ services:
       - rest
     ports:
       - 8000:8000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kaas-rest.rule=Host(`rest.kaas.test`)"
+      - "traefik.http.routers.kaas-rest.middlewares=transparent@file"
+      - "traefik.http.services.kaas-rest.loadbalancer.server.port=8000"
 
   web-tty:
     image: ghcr.io/uniba-ktr/kaas-web-tty:latest
     depends_on:
       - daemon
+      - traefik
     restart: on-failure
-    ports:
-      - 8001:8080
+    #ports:
+    #  - 8001:8080
     networks:
       - kind
       - rest
@@ -58,10 +67,62 @@ services:
       - DOCKER_HOST=tcp://docker:2376
     volumes:
       - docker-certs-client:/certs/client:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kaas-tty.rule=Host(`tty.kaas.test`)"
+      - "traefik.http.services.kaas-tty.loadbalancer.server.port=8080"
+
 
   kathara-ui:
-    image: ghcr.io/uniba-ktr/kaas-kathara-ui:latest
-    ports:
-      - 8080:8080
+    image: ghcr.io/uniba-ktr/kaas-kathara-ui-vue3:latest
+    depends_on:
+      - traefik
+    #ports:
+    #  - 8080:8080
     networks:
       - rest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kaas-ui.rule=Host(`kaas.test`)"
+      - "traefik.http.routers.kaas-ui.middlewares=transparent@file"
+      - "traefik.http.services.kaas-ui.loadbalancer.server.port=8080"
+
+
+  # TODO: For using traefik add the following line to /etc/hosts:
+  # 127.0.0.1 kaas.test rest.kaas.test tty.kaas.test traefik.kaas.test
+  traefik:
+    container_name: "traefik"
+    image: traefik:v2.5
+    restart: on-failure:5
+    command:
+      - "--log.level=DEBUG"
+    environment:
+      - TZ=${TIME_ZONE:-Europe/Berlin}
+    volumes:
+      # TODO: Replace by client-certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      #- docker-certs-client:/certs/client:ro
+      - ./proxy/config/:/etc/traefik/
+    networks:
+      - rest
+      - kind
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100k"
+        max-file: "2"
+    labels:
+      # TODO: SSL termination for deployments!
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-http.rule=Host(`traefik.kaas.test`)"
+      - "traefik.http.routers.traefik-http.service=api@internal"
+
+# Reserved TLD names for testing RFC 2606
+# dnsmasq configuration for *.test domain

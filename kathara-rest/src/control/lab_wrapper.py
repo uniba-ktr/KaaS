@@ -21,11 +21,14 @@ class LabWrapper(Lab):
 
     def __init__(self, lab_name: str, lab_state: LabStatus = LabStatus.submitted):
         self.state = lab_state
-        super().__init__(name=lab_name, path=os.path.abspath(lab_name))
+        lab_dir = os.environ.get('LAB_DIR', os.path.abspath('../labs'))
+        self.path = "{}/{}".format(lab_dir, lab_name)
+        log.info("Path: {}".format(self.path))
+        super().__init__(name=lab_name)
 
     def __parse_lab__(self):
         if self.state is LabStatus.created or LabStatus.starting or LabStatus.running or LabStatus.cleaning:
-            if not os.path.isdir(os.path.abspath(self.name)):
+            if not os.path.isdir(self.path):
                 raise InternalServerError(IOError, "Laboratory Path not found for {}".format(self.name),
                                           status.HTTP_404_NOT_FOUND)
         else:
@@ -50,10 +53,14 @@ class LabWrapper(Lab):
         return Message(lab_name=self.name, lab_hash=self.hash, lab_status=self.state)
 
     # TODO: ADD a proj_dir for saving the projects
-    def gen_lab(self, data: Laboratory, lab_hash: str, proj_dir: str = None) -> Tuple[LabStatus, str]:
-        log.info("Generating laboratory in the folder {}".format(data.name))
+    def gen_lab(self, data: Laboratory, lab_hash: str) -> Tuple[LabStatus, str]:
+        log.info("Generating laboratory in the folder {}".format(self.path))
         log.info(data)
-        os.makedirs(self.name, exist_ok=True)
+        os.makedirs(self.path, exist_ok=True)
+        if not os.path.isdir(self.path):
+            log.error("Path {} does not exist!".format(self.path))
+            raise InternalServerError(IOError, "Path could not be created for {}".format(self.name),
+                                      status.HTTP_404_NOT_FOUND)
 
         self.__save_json__(data.dict())
 
@@ -75,7 +82,7 @@ class LabWrapper(Lab):
             lab_file += self.__depac_host__(host)
             lab_file += "\n"
 
-        with open(self.name + "/lab.conf", "w") as out:
+        with open(self.path + "/lab.conf", "w") as out:
             out.write(lab_file)
 
         if data.shared:
@@ -106,29 +113,29 @@ class LabWrapper(Lab):
     def __gen_files__(self, file_list: Files, name: str):
         log.info(file_list)
         for file in file_list.__root__:
-            subdir = self.name
+            subdir = self.path
             if file.location:
                 location = file.location if file.location[0] == "/" else "/{}".format(file.location)
-                subdir = "{0}/{1}{2}".format(self.name, name, location)
+                subdir = "{0}/{1}{2}".format(self.path, name, location)
                 os.makedirs(subdir, exist_ok=True)
             with open(subdir + "/" + file.name, "w") as out:
                 out.write(file.content)
 
     def __save_json__(self, data: json):
-        os.makedirs(self.name, exist_ok=True)
-        with open(self.name + "/lab.json", "w") as out:
+        os.makedirs(self.path, exist_ok=True)
+        with open(self.path + "/lab.json", "w") as out:
             out.write(json.dumps(data))
 
-    def __load_json__(self, name: str):
+    def __load_json__(self):
         try:
-            with open(name + "/lab.json", "r") as f:
+            with open(self.path + "/lab.json", "r") as f:
                 self.__dict__ = json.load(f)
         except FileNotFoundError as e:
-            log.error("File not found: {}".format(name))
+            log.error("File not found: {}".format(self.path))
             raise InternalServerError(e, str(e))
 
     def remove_lab(self):
-        log.debug("Removing {}", format(self.name))
-        shutil.rmtree(self.name)
+        log.debug("Removing {}", format(self.path))
+        shutil.rmtree(self.path)
         self.state = LabStatus.removed
         return LabStatus.removed, self.hash

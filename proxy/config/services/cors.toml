@@ -1,0 +1,7 @@
+[http.middlewares]
+[http.middlewares.cors.headers]
+accessControlAllowMethods = ["*"]
+accessControlAllowHeaders= "*"
+accessControlAllowOriginList = ["*"]
+accessControlMaxAge = 3600
+addVaryHeader = true

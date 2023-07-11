@@ -1,0 +1,14 @@
+.page-header {
+	color: $white;
+	padding: 0;
+	border: none;
+	margin-bottom: $spacer;
+	font-weight: $font-weight-bold;
+	font-size: rem(28px);
+	
+	& small {
+		font-size: rem(16px);
+		color: rgba($white, .5);
+		font-weight: $font-weight-light;
+	}
+}
