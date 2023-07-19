@@ -2,12 +2,8 @@
 
 
 function install_k3(){
-  curl -sfL https://get.k3s.io | sh -
-
-cat <<CONF | sudo tee -a /etc/systemd/system/k3s.service.env
-K3S_KUBECONFIG_MODE="644"
-CONF
-   sudo kubectl proxy >/dev/null 2>&1
+  curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
+  sudo kubectl proxy >/dev/null 2>&1
 }
 
 function kat_megalos(){

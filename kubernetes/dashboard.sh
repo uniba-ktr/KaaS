@@ -4,8 +4,8 @@ cmd="kubectl proxy"
 count=`pgrep -cf "$cmd"`
 version_kube_dashboard="v2.7.0"
 dashboard_yaml="https://raw.githubusercontent.com/kubernetes/dashboard/${version_kube_dashboard}/aio/deploy/recommended.yaml"
-msgstarted="-e Kubernetes Dashboard e[92mstartede[0m"
-msgstopped="Kubernetes Dashboard stopped"
+msgstarted="-e Kubernetes Dashboard \e[32mstarted\e[0m"
+msgstopped="-e Kubernetes Dashboard \e[31mstopped\e[0m"
 
 case $1 in
 start)
@@ -28,8 +28,9 @@ stop)
       kill -9 $(pgrep -f "$cmd")
    fi
    kubectl delete -f $dashboard_yaml >/dev/null 2>&1
-   kubectl delete -f ~/dashboard/dashboard-admin.yaml >/dev/null 2>&1
-   kubectl delete -f ~/dashboard/dashboard-read-only.yaml >/dev/null 2>&1
+   kubectl delete -f ./dashboard/dashboard.admin-user.yml >/dev/null 2>&1
+   kubectl delete -f ./dashboard/dashboard.admin-user-role.yml >/dev/null 2>&1
+   kubectl delete -f ./dashboard/dashboard.read-only.yml >/dev/null 2>&1
    echo $msgstopped
    ;;
 
@@ -53,12 +54,18 @@ esac
 
 # Show full command line # ps -wfC "$cmd"
 if [ $showtoken -gt 0 ]; then
+  echo "Access Dashboard at:"
+  echo "http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
+  echo
+
    # Show token
    echo "Admin token:"
-   kubectl get secret -n kubernetes-dashboard $(kubectl get serviceaccount admin-user -n kubernetes-dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+   kubectl create token admin-user -n kubernetes-dashboard
+   #kubectl get secret -n kubernetes-dashboard $(kubectl get serviceaccount admin-user -n kubernetes-dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
    echo
 
    echo "User read-only token:"
-   kubectl get secret -n kubernetes-dashboard $(kubectl get serviceaccount read-only-user -n kubernetes-dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+   kubectl create token read-only-user -n kubernetes-dashboard
+   #kubectl get secret -n kubernetes-dashboard $(kubectl get serviceaccount read-only-user -n kubernetes-dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
    echo
 fi
