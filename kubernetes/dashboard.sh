@@ -13,7 +13,6 @@ msginstalled="-e K3s successfully \e[32minstalled\e[0m"
 
 function install_k3s(){
   curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
-  sudo kubectl proxy >/dev/null 2>&1
   echo $msginstalled
 }
 
