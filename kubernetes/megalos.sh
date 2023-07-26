@@ -2,8 +2,6 @@
 megalos_yml="https://raw.githubusercontent.com/KatharaFramework/Megalos-CNI/master/kathara-daemonset.yml"
 multus_yml="https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/v4.0.2/deployments/multus-daemonset-thick.yml"
 flannel_yml="https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml"
-proxy_port=8001
-proxy_address="localhost"
 kathara_config="${HOME}/.config/kathara.conf"
 
 function start_megalos(){
@@ -21,14 +19,6 @@ function stop_megalos(){
 }
 
 function api_setup(){
-  # TODO Write to Kathara config
-  # Accessing the KUBE-API https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-api/
-  # TODO check if proxy is already running
-  kubectl proxy --address=$proxy_address --port=$proxy_port  >/dev/null 2>&1 &
-  proxy="http://${proxy_address}:${proxy_port}"
-  printf "Proxy:\n%s\n" "${proxy}"
-
-
   api_server=$(kubectl config view -o jsonpath="{.clusters[?(@.name==\"default\")].cluster.server}")
   # TODO: Access Token for Kathara
   printf "API-Server:\n%s\n" "${api_server}"
