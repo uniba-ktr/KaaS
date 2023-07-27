@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
+source proxy.sh
+
 megalos_yml="https://raw.githubusercontent.com/KatharaFramework/Megalos-CNI/master/kathara-daemonset.yml"
 multus_yml="https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/v4.0.2/deployments/multus-daemonset-thick.yml"
 flannel_yml="https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml"
 kathara_config="${HOME}/.config/kathara.conf"
+
 
 function start_megalos(){
   #kubectl apply -f ${flannel_yml} >/dev/null 2>&1
@@ -22,6 +25,9 @@ function api_setup(){
   api_server=$(kubectl config view -o jsonpath="{.clusters[?(@.name==\"default\")].cluster.server}")
   # TODO: Access Token for Kathara
   printf "API-Server:\n%s\n" "${api_server}"
+
+  proxy=$(proxy_start)
+  printf "Proxy:\n%s\n" "${proxy}"
 
   # Get the token value
   kubectl apply -f ./megalos/kathara-token.yml >/dev/null 2>&1

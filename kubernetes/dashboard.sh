@@ -1,4 +1,5 @@
 #!/bin/bash
+source proxy.sh
 showtoken=1
 # not working with k3s:
 cmd="kubectl"
@@ -9,8 +10,7 @@ dashboard_yaml="https://raw.githubusercontent.com/kubernetes/dashboard/${version
 msgstarted="Kubernetes Dashboard \e[32mstarted\e[0m"
 msgstopped="Kubernetes Dashboard \e[31mstopped\e[0m"
 msginstalled="K3s successfully \e[32minstalled\e[0m"
-proxy_port=8001
-proxy_address="localhost"
+
 
 # TODO Skooner?
 
@@ -35,9 +35,6 @@ function start_dashboard() {
 
 function stop_dashboard() {
     showtoken=0
-    if [ "$count" -gt 0 ]; then
-       kill -9 $(pgrep -f "$cmd")
-    fi
     kubectl delete -f $dashboard_yaml >/dev/null 2>&1
     kubectl delete -f ./dashboard/dashboard.admin-user.yml >/dev/null 2>&1
     kubectl delete -f ./dashboard/dashboard.admin-user-role.yml >/dev/null 2>&1
@@ -81,8 +78,7 @@ esac
 if [ $showtoken -gt 0 ]; then
   # Accessing the KUBE-API https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-api/
   # TODO check if proxy is already running
-  kubectl proxy --address=$proxy_address --port=$proxy_port  >/dev/null 2>&1 &
-  proxy="http://${proxy_address}:${proxy_port}"
+  proxy=$(proxy_start)
   printf "Proxy:\n%s\n" "${proxy}"
 
   dashboard="http://${proxy_address}:${proxy_port}/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
