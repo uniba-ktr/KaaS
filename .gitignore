@@ -383,3 +383,4 @@ dist
 # TODO: test laboratory in gitignore!
 kathara-rest/src/example
 kathara-rest/example
+!kubernetes/lib/
