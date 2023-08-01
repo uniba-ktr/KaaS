@@ -59,8 +59,10 @@ function config_kathara(){
   mv new_kathara.conf "${HOME}"/.config/kathara.conf
 }
 
-function attach_shell(){
-  kubectl -n default exec --stdin --tty redis-pod -- /bin/sh
+function alpine_test(){
+  kubectl -n default apply -f network.yml
+  kubectl -n default apply -f alpine-test.yml
+  kubectl -n default exec --stdin --tty alpine-pod -- /bin/sh
 }
 
 case $1 in

@@ -29,6 +29,19 @@ function sub_dashboard(){
   esac
 }
 
+function sub_weave(){
+  case $1 in
+  start)
+    echo "starting weave dashboard";
+    start_weave_scope;;
+  stop)
+    echo "stopping weave dashboard";
+    stop_weave_scope;;
+  state)
+    echo "TODO";;
+  esac
+}
+
 function sub_megalos(){
   case $1 in
   start)
@@ -66,6 +79,7 @@ Usage: $ProgName <subcommand> [required] {optional}
 Subcommands
   kubernetes [install|uninstall]       Installing k3s and dependencies for this script
   dashboard [start|stop|state]         Executing a Kubernetes Dashboard on k3s
+  weave [start|stop|state]             Executing Weave Scope on port 4040 (Dashboard)
   megalos [start|stop|state|kathara]   Starting the Megalos Framework
   proxy [start|stop|state]             Checking the Kubernetes Proxy
 

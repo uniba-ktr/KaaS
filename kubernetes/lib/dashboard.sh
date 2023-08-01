@@ -7,11 +7,21 @@ cmd="kubectl"
 count=`pgrep -cf "$cmd"`
 version_kube_dashboard="v2.7.0"
 dashboard_yaml="https://raw.githubusercontent.com/kubernetes/dashboard/${version_kube_dashboard}/aio/deploy/recommended.yaml"
+weave_scope_yaml="https://github.com/weaveworks/scope/releases/download/v1.13.2/k8s-scope.yaml"
 msgstarted="Kubernetes Dashboard \e[32mstarted\e[0m"
 msgstopped="Kubernetes Dashboard \e[31mstopped\e[0m"
 
 
 # TODO Skooner as alternative?
+
+function start_weave_scope() {
+  kubectl apply -f "${weave_scope_yaml}"
+  kubectl port-forward -n weave "$(kubectl get -n weave pod --selector=weave-scope-component=app -o jsonpath='{.items..metadata.name}')" 4040 >/dev/null 2>&1 &
+}
+
+function stop_weave_scope() {
+  kubectl delete -f "${weave_scope_yaml}"
+}
 
 function start_dashboard() {
     kubectl apply -f $dashboard_yaml >/dev/null 2>&1
@@ -76,7 +86,7 @@ function status_dashboard(){
 # needs proxy address for the dashboard
 function access(){
     proxy=$1
-    dashboard="http://${proxy}/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
+    dashboard="${proxy}/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
 
     printf "Access Dashboard at:\n%s\n" "${dashboard}"
 
