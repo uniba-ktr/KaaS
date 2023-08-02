@@ -9,10 +9,11 @@ source ./lib/megalos.sh
 function sub_kubernetes(){
   case $1 in
   install)
-    echo "Install k3s";
-    install_k3s;;
+    echo "Install k3d";
+    install_k3d;;
   uninstall)
-    echo "Uninstall k3s";;
+    echo "Uninstall k3s";
+    uninstall_k3s;;
   esac
 }
 
