@@ -16,7 +16,6 @@ msgstopped="Kubernetes Dashboard \e[31mstopped\e[0m"
 
 function start_weave_scope() {
   kubectl apply -f "${weave_scope_yaml}"
-  kubectl port-forward -n weave "$(kubectl get -n weave pod --selector=weave-scope-component=app -o jsonpath='{.items..metadata.name}')" 4040 >/dev/null 2>&1 &
 }
 
 function stop_weave_scope() {
@@ -83,6 +82,16 @@ function status_dashboard(){
   esac
 }
 
+function status_weave(){
+  state=$(kubectl get pods -n weave -l name=weave-scope-app -o 'jsonpath={.items[*].status.containerStatuses[*].state}' | jq -r 'keys[0]')
+  printf "Weave is in state %s\n" "${state}"
+
+  case $state in
+  running)
+    access_weave;;
+  esac
+}
+
 # needs proxy address for the dashboard
 function access(){
     proxy=$1
@@ -98,11 +107,25 @@ function access(){
     printf "User read-only token (expires):\n%s\n" ${user_token}
 
     while true; do
-          read -r -p "Do you wish to open the proxy in your browser (y/n)? " yn
+          read -r -p "Do you wish to open the dashboard in your browser (y/n)? " yn
           case $yn in
               [Yy]* ) open_browser "${dashboard}" "${admin_token}"; break;;
               [Nn]* ) exit;;
               * ) echo "Please answer yes or no.";;
           esac
       done
+}
+
+function access_weave(){
+  kubectl port-forward -n weave "$(kubectl get -n weave pod --selector=weave-scope-component=app -o jsonpath='{.items..metadata.name}')" 4040 >/dev/null 2>&1 &
+  weave_url="http://localhost:4040"
+  printf "Access Weave at:\n%s\n" ${weave_url}
+  while true; do
+            read -r -p "Do you wish to open weave in your browser (y/n)? " yn
+            case $yn in
+                [Yy]* ) open_browser "${weave_url}"; break;;
+                [Nn]* ) exit;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
 }

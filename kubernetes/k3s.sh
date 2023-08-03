@@ -2,18 +2,24 @@
 proxy_port=8001
 proxy_address="localhost"
 
+K3D_CLUSTER="dev"
+
+source ./lib/k3d.sh
 source ./lib/proxy.sh
 source ./lib/dashboard.sh
 source ./lib/megalos.sh
 
 function sub_kubernetes(){
   case $1 in
-  install)
-    echo "Install k3d";
-    install_k3d;;
+  create)
+    echo "Create cluster with k3d and install it if necessary";
+    create_cluster ${K3D_CLUSTER};;
+  delete)
+    echo "Delete cluster";
+    delete_cluster ${K3D_CLUSTER};;
   uninstall)
-    echo "Uninstall k3s";
-    uninstall_k3s;;
+    echo "Uninstall k3d";
+    uninstall_k3d;;
   esac
 }
 
@@ -39,7 +45,7 @@ function sub_weave(){
     echo "stopping weave dashboard";
     stop_weave_scope;;
   state)
-    echo "TODO";;
+    status_weave;;
   esac
 }
 
@@ -78,7 +84,7 @@ cat << EOM
 This script helps run a specified video stream with different codecs.
 Usage: $ProgName <subcommand> [required] {optional}
 Subcommands
-  kubernetes [install|uninstall]       Installing k3s and dependencies for this script
+  kubernetes [create|delete|uninstall] Installing k3d, create and delete a cluster
   dashboard [start|stop|state]         Executing a Kubernetes Dashboard on k3s
   weave [start|stop|state]             Executing Weave Scope on port 4040 (Dashboard)
   megalos [start|stop|state|kathara]   Starting the Megalos Framework
