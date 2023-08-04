@@ -86,6 +86,15 @@ function sub_start(){
   sub_proxy start
 }
 
+function sub_stop(){
+  sub_proxy stop
+  sub_dashboard stop
+  sub_weave stop
+  sub_megalos stop
+  sub_kubernetes delete
+}
+
+
 
 function sub_help(){
 cat << EOM
@@ -93,6 +102,7 @@ This script helps run a specified video stream with different codecs.
 Usage: $ProgName <subcommand> [required] {optional}
 Subcommands
   start                                Creates cluster and starts dashboard, weave, megalos and proxy
+  stop                                 Deletes cluster and stops dashboard, weave, megalos and proxy
   kubernetes [create|delete|uninstall] Installing k3d, create and delete a cluster
   dashboard [start|stop|state]         Executing a Kubernetes Dashboard on k3s
   weave [start|stop|state]             Executing Weave Scope on port 4040 (Dashboard)

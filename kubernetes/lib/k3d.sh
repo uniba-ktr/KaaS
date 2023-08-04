@@ -41,7 +41,9 @@ function create_cluster(){
                             --port 8443:443@loadbalancer \
                             --api-port 6443 \
                             --agents 2
-                            #--k3s-arg "--flannel-backend=none@server:0" \
+                            #--k3s-arg "--flannel-backend=none@server:*" \
+                            #--k3s-arg "--flannel-backend=none@agent:*"
+                            #--volume "$(pwd)/kube-flannel.yml:/var/lib/rancher/k3s/server/manifests/kube-flannel.yml"
                             #--volume "$(pwd)/calico.yaml:/var/lib/rancher/k3s/server/manifests/calico.yaml"
                             # --servers 1 --agents 3 \
 }
