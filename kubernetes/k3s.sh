@@ -78,12 +78,21 @@ function sub_proxy(){
   esac
 }
 
+function sub_start(){
+  sub_kubernetes create
+  sub_dashboard start
+  sub_weave start
+  sub_megalos start
+  sub_proxy start
+}
+
 
 function sub_help(){
 cat << EOM
 This script helps run a specified video stream with different codecs.
 Usage: $ProgName <subcommand> [required] {optional}
 Subcommands
+  start                                Creates cluster and starts dashboard, weave, megalos and proxy
   kubernetes [create|delete|uninstall] Installing k3d, create and delete a cluster
   dashboard [start|stop|state]         Executing a Kubernetes Dashboard on k3s
   weave [start|stop|state]             Executing Weave Scope on port 4040 (Dashboard)
@@ -95,6 +104,7 @@ $ProgName <subcommand> -h|--help
 EOM
 }
 
+# https://www.suse.com/c/advanced-kubernetes-networking/
 subcommand=$1
 case $subcommand in
     "" | "-h" | "--help")

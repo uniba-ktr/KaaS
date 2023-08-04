@@ -40,8 +40,9 @@ function create_cluster(){
   k3d cluster create "${1}" --port 8080:80@loadbalancer \
                             --port 8443:443@loadbalancer \
                             --api-port 6443 \
-                            --k3s-arg "--flannel-backend=none@server:0" \
-                            --volume "$(pwd)/calico.yaml:/var/lib/rancher/k3s/server/manifests/calico.yaml"
+                            --agents 2
+                            #--k3s-arg "--flannel-backend=none@server:0" \
+                            #--volume "$(pwd)/calico.yaml:/var/lib/rancher/k3s/server/manifests/calico.yaml"
                             # --servers 1 --agents 3 \
 }
 
