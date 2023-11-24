@@ -1,7 +1,7 @@
 fastapi~=0.99.1
 uvicorn
 websockets
-kathara~=3.6.2
+kathara~=3.7.0
 jsonschema~=4.17.3
 
 pydantic~=1.10.11
