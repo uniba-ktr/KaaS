@@ -67,3 +67,11 @@ After the system has been successfully initialize you can access the components 
 - [TTY for container](https://github.com/wrfly/container-web-tty)
 - [TTY.js](https://github.com/chjj/tty.js)
 - [Netkit creator](https://github.com/agp8x/netkit-creator)
+
+
+## Publication and Presentation
+The P4 Multipath transmissions concept is developed by [Computer Networks Group](https://www.uni-bamberg.de/ktr/). 
+
+Our publication can be found here:
+- <a href="https://opus.bibliothek.uni-wuerzburg.de/files/32218/Grossmann_Le_Kathara_WueWoWas23_1570913204.pdf" target="_blank"> **Visualization of Network Emulation Enabled by Kathará**</a> (at WueWoWas 2023)
+- <a href="https://lsinfo3.github.io/WueWoWAS2023/assets/slides/marcel_grossmann.pdf" target="_blank">Presentation</a>
